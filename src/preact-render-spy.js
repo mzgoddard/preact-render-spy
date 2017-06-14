@@ -15,12 +15,21 @@ const spyWalk = (spy, vdom) => {
 };
 
 const createSpy = (spy, Component) => {
-  class Spy extends Component {
-    render(...args) {
-      const output = super.render(...args);
-      spy._output(this, output);
-      return spyWalk(spy, output);
+  let Spy;
+  if (!Component.prototype.render) {
+    Spy = function(...args) {
+      const output = Component.call(this, ...args);
+      return spy._output(Spy, output), spyWalk(spy, output);
+    };
+  }
+  else {
+    class _Spy extends Component {
+      render(...args) {
+        const output = super.render(...args);
+        return spy._output(this.constructor, output, spyWalk(spy, output));
+      }
     }
+    Spy = _Spy;
   }
 
   Spy.isSpy = true;
@@ -30,25 +39,24 @@ const createSpy = (spy, Component) => {
 
 class SpyWrapper {
   constructor(Component) {
+    this.map = new Map();
     this.domMap = new Map();
+    this.vdomMap = new Map();
     this.fragment = document.createDocumentFragment();
   }
 
-  _output(nodeName, vdom) {
-    if (typeof nodeName === 'string') {
-      this.domMap.set(nodeName, vdom);
-    }
-    else {
-      this.domMap.set(nodeName.constructor, vdom);
-    }
+  _output(nodeName, vdom, spyVDom) {
+    this.domMap.set(nodeName, vdom);
+    this.vdomMap.set(nodeName, spyVDom);
+    return spyVDom;
   }
 
-  output(selector) {
-    return this._getVDom(this.fragment.querySelector(selector));
-  }
+  // output(selector) {
+  //   return this._getVDom(this.fragment.querySelector(selector));
+  // }
 
   find(selector) {
-    return new FindWrapper(this, this.fragment, selector);
+    return new FindWrapper(this, this.domMap.get('root'), this.vdomMap.get('root'), selector);
   }
 
   _getVDom(element) {
@@ -72,22 +80,89 @@ class SpyWrapper {
   }
 
   render(vdom) {
-    vdom = spyWalk(this, vdom);
+    const spydom = this._output('root', vdom, spyWalk(this, vdom));
     this._rootConstructor = vdom.nodeName;
     if (typeof vdom.nodeName === 'string') {
-      this._output(vdom.nodeName, vdom);
+      this._output(vdom.nodeName, vdom, spydom);
     }
-    this.component = render(vdom, this.fragment);
+    this.component = render(spydom, this.fragment);
     return this;
   }
 }
 
+const _isWhere = (where, target) => {
+  let all = true;
+  for (let [key, value] of Object.entries(where)) {
+    if (typeof value === 'object') {
+      all = all && Boolean(target[key]) && _isWhere(value, target[key]);
+    }
+    else if (key === 'nodeName') {
+      if (/[a-z]/.test(value[0])) {
+        all = all && target.nodeName === value;
+      }
+      else {
+        all = all && Boolean(target.nodeName.constructor) &&
+          target.nodeName.constructor.name === value;
+      }
+    }
+    else {
+      if (value === null) {
+        all = all && key in target;
+      }
+      else if (Array.isArray(value)) {
+        all = value.reduce((carry, value) => (
+          carry && target[key].indexOf(value) !== -1
+        ), all);
+      }
+      else {
+        all = all && Boolean(target) && target[key] === value;
+      }
+    }
+  }
+  return all;
+};
+
+const isWhere = where => value => _isWhere(where, value);
+
+const selToWhere = sel => {
+  if (/^\./.test(sel)) {
+    return {attributes: {class: sel.substring(1)}};
+  }
+  else if (/^#/.test(sel)) {
+    return {attributes: {id: sel.substring(1)}};
+  }
+  else if (/^\[/.test(sel)) {
+    return {attributes: {[sel.substring(1, sel.length - 1)]: null}};
+  }
+  else {
+    return {nodeName: sel};
+  }
+};
+
+const vdomWalk = (pred, spy, dom, spydom, result = []) => {
+  if (pred(dom)) {
+    result.push(dom);
+  }
+
+  if (typeof dom.nodeName === 'function') {
+    vdomWalk(pred, spy, spy.domMap.get(spydom.nodeName), spy.vdomMap.get(spydom.nodeName), result);
+  }
+  else {
+    dom.children.forEach((child, i) => (
+      vdomWalk(pred, spy, child, spydom.children[i], result)
+    ));
+  }
+
+  return result;
+};
+
 class FindWrapper {
-  constructor(spy, root, selector) {
+  constructor(spy, root, spyroot, selector) {
     this.spy = spy;
     this.root = root;
+    this.spyroot = spyroot;
     this.selector = selector;
-    Array.from(root.querySelectorAll(selector))
+    vdomWalk(isWhere(selToWhere(selector)), spy, root, spyroot)
     .forEach((element, index) => {
       this[index] = element;
       this.length = index + 1;
@@ -96,7 +171,7 @@ class FindWrapper {
 
   simulate(event, ...args) {
     for (let i = 0; i < this.length; i++) {
-      const vdom = this.spy._getVDom(this[i]);
+      const vdom = this[i];
       const handle = vdom.attributes && vdom.attributes[events[event]];
       if (handle) {
         handle(...args);
