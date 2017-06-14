@@ -1,7 +1,5 @@
 const {render} = require('preact');
 
-const events = require('./events');
-
 const spyWalk = (spy, vdom) => {
   if (typeof vdom.nodeName === 'function' && !vdom.nodeName.isSpy) {
     vdom = Object.assign({}, vdom, {nodeName: createSpy(spy, vdom.nodeName)});
@@ -172,9 +170,14 @@ class FindWrapper {
   simulate(event, ...args) {
     for (let i = 0; i < this.length; i++) {
       const vdom = this[i];
-      const handle = vdom.attributes && vdom.attributes[events[event]];
-      if (handle) {
-        handle(...args);
+      const eventlc = event.toLowerCase();
+      const eventKeys = new Set([`on${eventlc}`, `on${eventlc}capture`]);
+
+      for (const key in vdom.attributes) {
+        if (eventKeys.has(key.toLowerCase())) {
+          vdom.attributes[key](...args);
+          break;
+        }
       }
     }
     return new Promise(resolve => setTimeout(resolve, 0));
