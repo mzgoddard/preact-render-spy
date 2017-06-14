@@ -1,4 +1,4 @@
-const {render} = require('preact');
+const {render, rerender} = require('preact');
 
 const spyWalk = (spy, vdom) => {
   if (typeof vdom.nodeName === 'function' && !vdom.nodeName.isSpy) {
@@ -180,7 +180,7 @@ class FindWrapper {
         }
       }
     }
-    return new Promise(resolve => setTimeout(resolve, 0));
+    rerender();
   }
 }
 

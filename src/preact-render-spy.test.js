@@ -57,7 +57,7 @@ it('renders change on click', async () => {
   }
   const context = renderSpy(<Node className="node" />);
   expect(context.find('div')[0].attributes.class).toEqual('node0');
-  await context.find('div').simulate('click');
+  context.find('div').simulate('click');
   expect(context.find('div')[0].attributes.class).toEqual('node1');
 });
 
