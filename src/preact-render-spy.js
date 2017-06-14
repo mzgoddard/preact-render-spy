@@ -1,5 +1,8 @@
 const {render, rerender} = require('preact');
 
+const {isWhere} = require('./is-where');
+const {selToWhere} = require('./sel-to-where');
+
 const spyWalk = (spy, vdom) => {
   if (typeof vdom.nodeName === 'function' && !vdom.nodeName.isSpy) {
     vdom = Object.assign({}, vdom, {nodeName: createSpy(spy, vdom.nodeName)});
@@ -49,32 +52,8 @@ class SpyWrapper {
     return spyVDom;
   }
 
-  // output(selector) {
-  //   return this._getVDom(this.fragment.querySelector(selector));
-  // }
-
   find(selector) {
     return new FindWrapper(this, this.domMap.get('root'), this.vdomMap.get('root'), selector);
-  }
-
-  _getVDom(element) {
-    const indexPath = [];
-    while (element.parentNode !== this.fragment) {
-      const parentNode = element.parentNode;
-      indexPath.unshift(Array.from(parentNode.children).indexOf(element));
-      element = parentNode;
-    }
-    let vdom = this.domMap.get(this._rootConstructor);
-    while (indexPath.length) {
-      while (typeof vdom.nodeName === 'function') {
-        vdom = this.domMap.get(vdom.nodeName);
-      }
-      vdom = vdom.children[indexPath.shift()];
-    }
-    while (typeof vdom.nodeName === 'function') {
-      vdom = this.domMap.get(vdom.nodeName);
-    }
-    return vdom;
   }
 
   render(vdom) {
@@ -87,55 +66,6 @@ class SpyWrapper {
     return this;
   }
 }
-
-const _isWhere = (where, target) => {
-  let all = true;
-  for (let [key, value] of Object.entries(where)) {
-    if (typeof value === 'object') {
-      all = all && Boolean(target[key]) && _isWhere(value, target[key]);
-    }
-    else if (key === 'nodeName') {
-      if (/[a-z]/.test(value[0])) {
-        all = all && target.nodeName === value;
-      }
-      else {
-        all = all && Boolean(target.nodeName.constructor) &&
-          target.nodeName.constructor.name === value;
-      }
-    }
-    else {
-      if (value === null) {
-        all = all && key in target;
-      }
-      else if (Array.isArray(value)) {
-        all = value.reduce((carry, value) => (
-          carry && target[key].indexOf(value) !== -1
-        ), all);
-      }
-      else {
-        all = all && Boolean(target) && target[key] === value;
-      }
-    }
-  }
-  return all;
-};
-
-const isWhere = where => value => _isWhere(where, value);
-
-const selToWhere = sel => {
-  if (/^\./.test(sel)) {
-    return {attributes: {class: sel.substring(1)}};
-  }
-  else if (/^#/.test(sel)) {
-    return {attributes: {id: sel.substring(1)}};
-  }
-  else if (/^\[/.test(sel)) {
-    return {attributes: {[sel.substring(1, sel.length - 1)]: null}};
-  }
-  else {
-    return {nodeName: sel};
-  }
-};
 
 const vdomWalk = (pred, spy, dom, spydom, result = []) => {
   if (pred(dom)) {
