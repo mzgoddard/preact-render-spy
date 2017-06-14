@@ -39,15 +39,14 @@ it('renders changes', async () => {
 });
 
 it('componentWillReceiveProps', () => {
-  class Node extends Component {
+  class SubNode extends Component {
     constructor(props) {
       super(props);
-
       this.state = {count: props.count + 1};
     }
 
     componentWillReceiveProps(newProps) {
-      this.setState({count: newProps.count + 1});
+      this.setState({count: newProps.count + 2});
     }
 
     render(props, {count}) {
@@ -55,10 +54,23 @@ it('componentWillReceiveProps', () => {
     }
   }
 
+  class Node extends Component {
+    constructor(props) {
+      super(props);
+      this.state = {count: props.count};
+    }
+
+    render(props, {count}) {
+      return <SubNode
+        onClick={() => this.setState({})}
+        count={count} class={`node${count}`} />;
+    }
+  }
+
   const context = renderSpy(<Node count={1} />);
-  expect(context.find('.node2').length).toBe(1);
-  context.render(<Node count={3} />);
-  expect(context.find('.node4').length).toBe(1);
+  expect(context.find('.node1').length).toBe(1);
+  context.find('SubNode').simulate('click');
+  expect(context.find('.node3').length).toBe(1);
 });
 
 it('renders change on click', async () => {

@@ -3,9 +3,18 @@ const {render, rerender} = require('preact');
 const {isWhere} = require('./is-where');
 const {selToWhere} = require('./sel-to-where');
 
+const SPY_PRIVATE_KEY = 'SPY_PRIVATE_KEY';
+
+const privateKey = () => Math.random().toString(16).substring(2);
+
 const spyWalk = (spy, vdom) => {
   if (typeof vdom.nodeName === 'function' && !vdom.nodeName.isSpy) {
-    vdom = Object.assign({}, vdom, {nodeName: createSpy(spy, vdom.nodeName)});
+    vdom = Object.assign({}, vdom, {
+      nodeName: createSpy(spy, vdom.nodeName),
+      attributes: Object.assign({}, vdom.attributes, {
+        [SPY_PRIVATE_KEY]: privateKey(),
+      }),
+    });
   }
   else {
     vdom = Object.assign({}, vdom, {
@@ -15,19 +24,42 @@ const spyWalk = (spy, vdom) => {
   return vdom;
 };
 
+const popSpyKey = _props => {
+  const spyKey = _props[SPY_PRIVATE_KEY];
+  delete _props[SPY_PRIVATE_KEY];
+  return [spyKey, _props];
+};
+
 const createSpy = (spy, Component) => {
+  if (spy.componentMap.get(Component)) {return spy.componentMap.get(Component);}
+
   let Spy;
   if (!Component.prototype.render) {
-    Spy = function(...args) {
-      const output = Component.call(this, ...args);
-      return spy._output(Spy, output), spyWalk(spy, output);
+    Spy = function(_props, ...args) {
+      const [spyKey, props] = popSpyKey(_props);
+      const output = Component.call(this, props, ...args);
+      return spy._output(spyKey, output, spyWalk(spy, output));
     };
   }
   else {
     class _Spy extends Component {
+      constructor(_props, ...args) {
+        const [spyKey, props] = popSpyKey(_props);
+        super(props, ...args);
+
+        spy.keyMap.set(this, spyKey);
+      }
+      componentWillReceiveProps(_props, ...args) {
+        const [spyKey, props] = popSpyKey(_props);
+        spy.keyMap.set(this, spyKey);
+        if (super.componentWillReceiveProps) {
+          super.componentWillReceiveProps(props, ...args);
+        }
+      }
       render(...args) {
+        const spyKey = spy.keyMap.get(this);
         const output = super.render(...args);
-        return spy._output(this.constructor, output, spyWalk(spy, output));
+        return spy._output(spyKey, output, spyWalk(spy, output));
       }
     }
     Spy = _Spy;
@@ -35,12 +67,15 @@ const createSpy = (spy, Component) => {
 
   Spy.isSpy = true;
 
+  spy.componentMap.set(Component, Spy);
+
   return Spy;
 };
 
 class SpyWrapper {
   constructor(Component) {
-    this.map = new Map();
+    this.keyMap = new Map();
+    this.componentMap = new Map();
     this.domMap = new Map();
     this.vdomMap = new Map();
     this.fragment = document.createDocumentFragment();
@@ -57,11 +92,8 @@ class SpyWrapper {
   }
 
   render(vdom) {
+    const spyNodeName = this.componentMap.get(vdom.nodeName);
     const spydom = this._output('root', vdom, spyWalk(this, vdom));
-    this._rootConstructor = vdom.nodeName;
-    if (typeof vdom.nodeName === 'string') {
-      this._output(vdom.nodeName, vdom, spydom);
-    }
     this.component = render(spydom, this.fragment);
     return this;
   }
@@ -73,7 +105,8 @@ const vdomWalk = (pred, spy, dom, spydom, result = []) => {
   }
 
   if (typeof dom.nodeName === 'function') {
-    vdomWalk(pred, spy, spy.domMap.get(spydom.nodeName), spy.vdomMap.get(spydom.nodeName), result);
+    const spyKey = spydom.attributes[SPY_PRIVATE_KEY];
+    vdomWalk(pred, spy, spy.domMap.get(spyKey), spy.vdomMap.get(spyKey), result);
   }
   else {
     dom.children.forEach((child, i) => (
