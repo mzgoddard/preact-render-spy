@@ -38,6 +38,29 @@ it('renders changes', async () => {
   expect(context.find('div')[0]).toEqual(<div class="node2" />);
 });
 
+it('componentWillReceiveProps', () => {
+  class Node extends Component {
+    constructor(props) {
+      super(props);
+
+      this.state = {count: props.count + 1};
+    }
+
+    componentWillReceiveProps(newProps) {
+      this.setState({count: newProps.count + 1});
+    }
+
+    render(props, {count}) {
+      return <div class={`node${count}`} />;
+    }
+  }
+
+  const context = renderSpy(<Node count={1} />);
+  expect(context.find('.node2').length).toBe(1);
+  context.render(<Node count={3} />);
+  expect(context.find('.node4').length).toBe(1);
+});
+
 it('renders change on click', async () => {
   class Node extends Component {
     constructor(...args) {
