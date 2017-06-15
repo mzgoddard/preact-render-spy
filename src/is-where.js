@@ -8,8 +8,11 @@ const _isWhere = (where, target) => {
       if (/[a-z]/.test(value[0])) {
         all = all && target.nodeName === value;
       }
-      else {
+      else if (typeof target.nodeName === 'function') {
         all = all && target.nodeName.name === value;
+      }
+      else {
+        all = false;
       }
     }
     else {

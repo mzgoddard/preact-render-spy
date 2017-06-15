@@ -1,4 +1,5 @@
 const {render, rerender} = require('preact');
+const isEqual = require('lodash.isequal');
 
 const {isWhere} = require('./is-where');
 const {selToWhere} = require('./sel-to-where');
@@ -14,7 +15,7 @@ const spyWalk = (spy, vdom) => {
       }),
     });
   }
-  else {
+  else if (vdom.children) {
     vdom = Object.assign({}, vdom, {
       children: vdom.children.map(child => spyWalk(spy, child)),
     });
@@ -92,7 +93,7 @@ class SpyWrapper {
   }
 
   find(selector) {
-    return new FindWrapper(this, this.vdomMap.get('root'), selector);
+    return new FindWrapper(this, [this.vdomMap.get('root')], selector);
   }
 
   render(vdom) {
@@ -112,11 +113,21 @@ const vdomIter = function* (vdomMap, vdom) {
     yield* vdomIter(vdomMap, vdomMap.get(vdom));
   }
   else {
-    for (const child of vdom.children) {
+    for (const child of (vdom.children || [])) {
       yield* vdomIter(vdomMap, child);
     }
   }
 };
+
+const vdomWalk = function* (vdomMap, iter) {
+  for (const vdom of iter) {
+    yield* vdomIter(vdomMap, vdom);
+  }
+  // // Flatten into one array of all nodes
+  // return [].concat(...Array.from(this, vdom => (
+  //   Array.from(vdomIter(this.spy.vdomMap, vdom))
+  // )));
+}
 
 const vdomFilter = (pred, vdomMap, vdom) => {
   return Array.from(vdomIter(vdomMap, vdom)).filter(pred);
@@ -127,16 +138,54 @@ const vdomContains = (pred, vdomMap, vdom) => {
 };
 
 class FindWrapper {
-  constructor(spy, root, selector) {
+  constructor(spy, _iter, selector) {
     this.spy = spy;
-    this.root = root;
-    this.selector = selector;
     this.length = 0;
-    vdomFilter(isWhere(selToWhere(selector)), spy.vdomMap, root)
+    let iter = _iter;
+    if (selector) {
+      this.selector = selector;
+      iter = [].concat(...Array.from(iter, root => (
+        Array.from(vdomFilter(isWhere(selToWhere(selector)), spy.vdomMap, root))
+      )));
+    }
+    iter
     .forEach((element, index) => {
       this[index] = element;
       this.length = index + 1;
     });
+  }
+
+  at(index) {
+    return new FindWrapper(this.spy, [this[index]]);
+  }
+
+  attr(name) {
+    for (const item of Array.from(this)) {
+      if (
+        typeof item === 'object' &&
+        item.attributes &&
+        item.attributes[name]
+      ) {
+        return item.attributes[name];
+      }
+    }
+  }
+
+  /**
+   * Return the text of all nested children concatenated together.
+   */
+  text() {
+    return Array.from(vdomWalk(this.spy.vdomMap, Array.from(this)))
+    // Filter for strings (text nodes)
+    .filter(value => typeof value === 'string')
+    // Concatenate all strings together
+    .reduce((carry, value) => carry + value);
+  }
+
+  contains(vdom) {
+    return Array.from(vdomWalk(this.spy.vdomMap, Array.from(this)))
+    .filter(value => isEqual(vdom, value))
+    .length > 0;
   }
 
   simulate(event, ...args) {
