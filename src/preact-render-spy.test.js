@@ -12,65 +12,70 @@ it('renders into fragment', async () => {
   expect(context.fragment.children.length).toBe(1);
   expect(context.fragment.children[0].tagName).toBe('DIV');
   expect(context.find('div').length).toBe(1);
-  expect(context.find('div')[0]).toEqual(<div />);
+  expect(context.find('div').contains(<div />)).toBeTruthy();
 });
 
 it('renders props', async () => {
   class Node extends Component {
-    render({className}) {
-      return <div class={className} />;
+    render({children}) {
+      return <div>{children}</div>;
     }
   }
-  const context = renderSpy(<Node className="node" />);
-  expect(context.find('.node').length).toBe(1);
-  expect(context.find('div')[0]).toEqual(<div class="node" />);
+  const context = renderSpy(<Node>node</Node>);
+  expect(context.find('div').length).toBe(1);
+  expect(context.find('div').text('node')).toBeTruthy();
 });
 
 it('renders changes', async () => {
   class Node extends Component {
-    render({className}) {
-      return <div class={className} />;
+    render({children}) {
+      return <div>{children}</div>;
     }
   }
-  const context = renderSpy(<Node className="node" />);
-  context.render(<Node className="node2" />);
-  expect(context.find('.node2').length).toBe(1);
-  expect(context.find('div')[0]).toEqual(<div class="node2" />);
+  const context = renderSpy(<Node>node</Node>);
+  context.render(<Node>node2</Node>);;
+  expect(context.find('div').contains('node2')).toBeTruthy();
 });
 
 it('componentWillReceiveProps', () => {
-  class SubNode extends Component {
+  class Child extends Component {
     constructor(props) {
       super(props);
-      this.state = {count: props.count + 1};
+      this.state = {value: props.value};
     }
 
     componentWillReceiveProps(newProps) {
-      this.setState({count: newProps.count + 2});
+      this.setState({value: `_${newProps.value}_`});
     }
 
-    render(props, {count}) {
-      return <div class={`node${count}`} />;
+    render(props, {value}) {
+      return (
+        <div>{value}</div>
+      );
     }
   }
 
-  class Node extends Component {
+  class Parent extends Component {
     constructor(props) {
       super(props);
-      this.state = {count: props.count};
+      this.state = {value: 'default'};
     }
 
-    render(props, {count}) {
-      return <SubNode
-        onClick={() => this.setState({})}
-        count={count} class={`node${count}`} />;
+    render(props, {value}) {
+      return (
+        <Child
+          onClick={() => this.setState({value: 'clicked'})}
+          value={value}
+        />
+      );
     }
   }
 
-  const context = renderSpy(<Node count={1} />);
-  expect(context.find('.node1').length).toBe(1);
-  context.find('SubNode').simulate('click');
-  expect(context.find('.node3').length).toBe(1);
+  const context = renderSpy(<Parent />);
+  const getChild = () => context.find('Child').at(0);
+  expect(getChild().text()).toBe('default');
+  getChild().simulate('click');
+  expect(getChild().text()).toBe('_clicked_');
 });
 
 it('renders change on click', async () => {
@@ -86,32 +91,32 @@ it('renders change on click', async () => {
       this.setState({count: this.state.count + 1});
     }
 
-    render({className}, {count}) {
-      return <div class={className + count} onClick={this.onClick} />;
+    render({}, {count}) {
+      return <div onClick={this.onClick}>{count}</div>;
     }
   }
-  const context = renderSpy(<Node className="node" />);
-  expect(context.find('div')[0].attributes.class).toEqual('node0');
+  const context = renderSpy(<Node/>);
+  expect(context.find('div').contains('0')).toBeTruthy();
   context.find('div').simulate('click');
-  expect(context.find('div')[0].attributes.class).toEqual('node1');
+  expect(context.find('div').contains('1')).toBeTruthy();
 });
 
 it('renders multiple components', () => {
   class Node extends Component {
     render({count}) {
-      return <div class={'node' + count} />;
+      return <div>{count}</div>;
     }
   }
   const context = renderSpy(<div><Node count="1" /><Node count="2" /></div>);
-  expect(context.find('.node1').length).toBe(1);
-  expect(context.find('.node1')[0]).toEqual(<div class="node1" />);
-  expect(context.find('.node2').length).toBe(1);
-  expect(context.find('.node2')[0]).toEqual(<div class="node2" />);
+  expect(context.find('div').contains('1')).toBeTruthy();
+  expect(context.find('div').contains(<div>1</div>)).toBeTruthy();
+  expect(context.find('div').contains('2')).toBeTruthy();
+  expect(context.find('div').contains(<div>2</div>)).toBeTruthy();
 });
 
 it('renders stateless components', () => {
-  const Node = ({count}) => <div class={`node${count}`} />;
+  const Node = ({count}) => <div>{count}</div>;
   const context = renderSpy(<Node count="1" />);
-  expect(context.find('.node1').length).toBe(1);
-  expect(context.find('.node1')[0]).toEqual(<div class="node1" />);
+  expect(context.find('div').length).toBe(1);
+  expect(context.find('div').contains('1')).toBeTruthy();
 });
