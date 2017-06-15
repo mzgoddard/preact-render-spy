@@ -5,8 +5,6 @@ const {selToWhere} = require('./sel-to-where');
 
 const SPY_PRIVATE_KEY = 'SPY_PRIVATE_KEY';
 
-const privateKey = () => Math.random().toString(16).substring(2);
-
 const spyWalk = (spy, vdom) => {
   if (typeof vdom.nodeName === 'function' && !vdom.nodeName.isSpy) {
     vdom = Object.assign({}, vdom, {
@@ -106,23 +104,26 @@ class SpyWrapper {
   }
 }
 
-// const vdomIter = function* (spy, dom, spydom) {
-//
-// };
-
-const vdomWalk = (pred, spy, vdom, result = []) => {
-  if (pred(vdom)) {
-    result.push(vdom);
+const vdomIter = function* (vdomMap, vdom) {
+  if (vdom) {
+    yield vdom;
   }
-
   if (typeof vdom.nodeName === 'function') {
-    vdomWalk(pred, spy, spy.vdomMap.get(vdom), result);
+    yield* vdomIter(vdomMap, vdomMap.get(vdom));
   }
   else {
-    vdom.children.forEach(child => vdomWalk(pred, spy, child, result));
+    for (const child of vdom.children) {
+      yield* vdomIter(vdomMap, child);
+    }
   }
+};
 
-  return result;
+const vdomFilter = (pred, vdomMap, vdom) => {
+  return Array.from(vdomIter(vdomMap, vdom)).filter(pred);
+};
+
+const vdomContains = (pred, vdomMap, vdom) => {
+  return vdomFilter(pred, vdomMap, vdom).length > 0;
 };
 
 class FindWrapper {
@@ -130,7 +131,8 @@ class FindWrapper {
     this.spy = spy;
     this.root = root;
     this.selector = selector;
-    vdomWalk(isWhere(selToWhere(selector)), spy, root)
+    this.length = 0;
+    vdomFilter(isWhere(selToWhere(selector)), spy.vdomMap, root)
     .forEach((element, index) => {
       this[index] = element;
       this.length = index + 1;
