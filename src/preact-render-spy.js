@@ -7,6 +7,9 @@ const {selToWhere} = require('./sel-to-where');
 const SPY_PRIVATE_KEY = 'SPY_PRIVATE_KEY';
 
 const spyWalk = (spy, vdom) => {
+  if (!vdom) {
+    return vdom;
+  }
   if (typeof vdom.nodeName === 'function' && !vdom.nodeName.isSpy) {
     vdom = Object.assign({}, vdom, {
       nodeName: createSpy(spy, vdom.nodeName),
@@ -106,9 +109,10 @@ class SpyWrapper {
 }
 
 const vdomIter = function* (vdomMap, vdom) {
-  if (vdom) {
-    yield vdom;
+  if (!vdom) {
+    return;
   }
+  yield vdom;
   if (typeof vdom.nodeName === 'function') {
     yield* vdomIter(vdomMap, vdomMap.get(vdom));
   }
