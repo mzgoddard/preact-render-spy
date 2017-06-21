@@ -18,6 +18,7 @@
     "babel-preset-preact": "^1.1.0",
     "hard-source-webpack-plugin": "^0.4.4",
     "jest": "^20.0.4",
+    "object.entries": "^1.0.4",
     "preact": "^8.1.0",
     "webpack": "^2.6.1",
     "webpack-if": "^0.1.1"

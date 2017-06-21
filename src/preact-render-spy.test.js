@@ -120,3 +120,10 @@ it('renders stateless components', () => {
   expect(context.find('div').length).toBe(1);
   expect(context.find('div').contains('1')).toBeTruthy();
 });
+
+it('renders components with null children', () => {
+  const Empty = () => null;
+  const Node = () => <div><Empty/>text</div>;
+  const context = renderSpy(<Node />);
+  expect(context.find('div').text()).toBe('text');
+});
