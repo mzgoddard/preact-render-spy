@@ -8,9 +8,9 @@ const selToWhere = sel => {
   else if (/^\[/.test(sel)) {
     return {attributes: {[sel.substring(1, sel.length - 1)]: null}};
   }
-  else {
-    return {nodeName: sel};
-  }
+  
+  return {nodeName: sel};
+  
 };
 
 module.exports = {

@@ -1,4 +1,4 @@
-const {h, Component} = require('preact');
+const {h} = require('preact');
 
 const {deep, shallow} = require('./preact-render-spy');
 

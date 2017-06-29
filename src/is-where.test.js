@@ -21,5 +21,5 @@ it('tests Component names', () => {
 
 it('tests nested attributes', () => {
   expect(isWhere({attributes: {class: 'class'}})(<div class="class" />))
-  .toBeTruthy();
+    .toBeTruthy();
 });

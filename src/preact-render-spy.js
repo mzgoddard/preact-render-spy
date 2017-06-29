@@ -41,11 +41,11 @@ const setVDom = (spy, spyKey, vdom) => {
   return vdom;
 };
 
-const NoopSpy = (props) => {nodeName: 'span'};
+const NoopSpy = ()=>{};
 
 const _createNoopSpy = (spy, Component) => {
   return function(_props) {
-    const [spyKey, depth, props] = popSpyKey(_props);
+    const [,, props] = popSpyKey(_props);
     const vdom = {
       nodeName: NoopSpy,
       attributes: Object.assign({
@@ -166,18 +166,10 @@ const vdomWalk = function* (vdomMap, iter) {
   for (const vdom of iter) {
     yield* vdomIter(vdomMap, vdom);
   }
-  // // Flatten into one array of all nodes
-  // return [].concat(...Array.from(this, vdom => (
-  //   Array.from(vdomIter(this.spy.vdomMap, vdom))
-  // )));
-}
+};
 
 const vdomFilter = (pred, vdomMap, vdom) => {
   return Array.from(vdomIter(vdomMap, vdom)).filter(pred);
-};
-
-const vdomContains = (pred, vdomMap, vdom) => {
-  return vdomFilter(pred, vdomMap, vdom).length > 0;
 };
 
 class FindWrapper {
@@ -192,10 +184,10 @@ class FindWrapper {
       )));
     }
     iter
-    .forEach((element, index) => {
-      this[index] = element;
-      this.length = index + 1;
-    });
+      .forEach((element, index) => {
+        this[index] = element;
+        this.length = index + 1;
+      });
   }
 
   at(index) {
@@ -231,15 +223,15 @@ class FindWrapper {
   text() {
     return Array.from(vdomWalk(this.spy.vdomMap, Array.from(this)))
     // Filter for strings (text nodes)
-    .filter(value => typeof value === 'string')
+      .filter(value => typeof value === 'string')
     // Concatenate all strings together
-    .join('');
+      .join('');
   }
 
   contains(vdom) {
     return Array.from(vdomWalk(this.spy.vdomMap, Array.from(this)))
-    .filter(value => isEqual(vdom, value))
-    .length > 0;
+      .filter(value => isEqual(vdom, value))
+      .length > 0;
   }
 
   simulate(event, ...args) {
@@ -268,4 +260,4 @@ exports.config = config;
 exports.deep = deep;
 exports.default = deep;
 exports.render = deep;
-exports.shallow = shallow
+exports.shallow = shallow;
