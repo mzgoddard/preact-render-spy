@@ -57,5 +57,5 @@ it('renders to a specified depth', () => {
   const context = render(<First />, { depth: 2 });
   expect(context.find('ErrorIfRendered').length).toBe(2);
 
-  expect( () => render(<First />, { depth: 3 })).toThrow();
+  expect(() => render(<First />, { depth: 3 })).toThrow();
 });
