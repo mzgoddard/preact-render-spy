@@ -7,11 +7,11 @@ const _isWhere = (where, target) => {
       all = all && Boolean(target[key]) && _isWhere(value, target[key]);
     }
     else if (key === 'nodeName') {
-      if (/[a-z]/.test(value[0])) {
-        all = all && target.nodeName === value;
+      if (typeof target.nodeName === 'function') {
+        all = all && (target.nodeName.name === value || target.nodeName.displayName === value);
       }
-      else if (typeof target.nodeName === 'function') {
-        all = all && target.nodeName.name === value;
+      else if (/[a-z]/.test(value[0])) {
+        all = all && target.nodeName === value;
       }
       else {
         all = false;
@@ -29,6 +29,10 @@ const _isWhere = (where, target) => {
       else {
         all = all && Boolean(target) && target[key] === value;
       }
+    }
+    // break the loop if we hit any falsyness
+    if (!all) {
+      break;
     }
   }
   return all;
