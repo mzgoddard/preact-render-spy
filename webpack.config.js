@@ -1,9 +1,6 @@
 const {join} = require('path');
 
-const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
-const wepbackif = require('webpack-if');
-
-module.exports = {
+module.exports = ({
   context: __dirname,
   entry: './src/entry',
   output: {
@@ -12,17 +9,16 @@ module.exports = {
   },
   module: {
     rules: [
+      // We only want to parse our test files for JSX with babel, we want everything else to work in native
+      // node!
       {
-        test: /\.jsx?$/,
+        test: /\.test\.js$/,
         exclude: [join(__dirname, 'node_modules')],
         loader: 'babel-loader',
         options: {
           presets: ['preact', 'env'],
         },
-      }
+      },
     ],
   },
-  plugins: [
-    new HardSourceWebpackPlugin(),
-  ],
-};
+});

@@ -34,7 +34,7 @@ const sharedTests = (name, func) => {
       }
     }
     const context = func(<Node>node</Node>);
-    context.render(<Node>node2</Node>);;
+    context.render(<Node>node2</Node>);
     expect(context.find('div').contains('node2')).toBeTruthy();
   });
 

@@ -17,18 +17,16 @@ const _isWhere = (where, target) => {
         all = false;
       }
     }
+    else if (value === null) {
+      all = all && key in target;
+    }
+    else if (Array.isArray(value)) {
+      all = value.reduce((carry, value) => (
+        carry && target[key].indexOf(value) !== -1
+      ), all);
+    }
     else {
-      if (value === null) {
-        all = all && key in target;
-      }
-      else if (Array.isArray(value)) {
-        all = value.reduce((carry, value) => (
-          carry && target[key].indexOf(value) !== -1
-        ), all);
-      }
-      else {
-        all = all && Boolean(target) && target[key] === value;
-      }
+      all = all && Boolean(target) && target[key] === value;
     }
     // break the loop if we hit any falsyness
     if (!all) {
