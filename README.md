@@ -22,13 +22,13 @@ is set to `Infinity`, and we provide another renderer called `shallow` to render
 ## Exported Methods
 
 ### `deep(jsx, {depth = Infinity} = {})`
-Creates a new `SpyWrapper` and renders using `opts.depth` to specify how many components deep
+Creates a new `RenderContext` and renders using `opts.depth` to specify how many components deep
 it should allow the renderer to render.  Also exported as `render` and `default`.
 
 ### `shallow(jsx)`
 Alias for `deep(jsx, {depth: 1})`
 
-### `SpyWrapper#find(selector)`
+### `RenderContext#find(selector)`
 Given a rendered context, `find` accepts a "css like" language of selectors to search through the
 rendered vdom for given nodes.
 
@@ -41,11 +41,11 @@ rendered vdom for given nodes.
 
 This will return you a `FindWrapper` which has other useful methods for testing.
 
-### `SpyWrapper#render(jsx)`
+### `RenderContext#render(jsx)`
 Re-renders the root level jsx node using the same depth initially requested.
 
 ### `FindWrapper`
-Contains a selection of nodes from `SpyWrapper#find(selector)`.
+Contains a selection of nodes from `RenderContext#find(selector)`.
 Has numeric indexed properties and length like an array.
 
 ### `FindWrapper#at(index)`
