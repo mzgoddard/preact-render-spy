@@ -49,3 +49,13 @@ it(`renders components with null children`, () => {
   const context = render(<Node />);
   expect(context.find('div').text()).toBe('text');
 });
+
+it('renders to a specified depth', () => {
+  const ErrorIfRendered = () => { throw new Error('this should not render'); };
+  const Second = () => <ErrorIfRendered />;
+  const First = () => <div><Second /><Second /></div>;
+  const context = render(<First />, { depth: 2 });
+  expect(context.find('ErrorIfRendered').length).toBe(2);
+
+  expect(() => render(<First />, { depth: 3 })).toThrow();
+});
