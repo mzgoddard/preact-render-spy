@@ -7,6 +7,21 @@ preact-render-spy is a package designed to cover many of the use cases for testi
 preact components.  The API is roughly modeled after enzyme, but we do not support
 as many options currently.
 
+## Expressive Testing Example:
+
+```jsx
+import {h} from 'preact';
+import {shallow} from 'preact-render-spy';
+import Testable from './testable';
+
+it('lets you do cool things with preact components', () => {
+  const context = shallow(<Testable />);
+  expect(context.find('div').contains(<a>link</a>)).toBeTruthy();
+  context.find('[onClick]').simulate('click');
+  expect(context.find('a').text()).toBe('clicked');
+});
+```
+
 ## How it works
 
 The main render method takes some arbitrary JSX and replaces any component nodes with
