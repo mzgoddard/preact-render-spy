@@ -27,6 +27,8 @@ module.exports = {
     "sleep": 1,
   },
   "rules": {
+    // only allow JSX in .test.js files
+    "react/jsx-filename-extension": [2, { "extensions": [".test.js"] }],
     // disabled because we are only using JSX in tests
     "react/jsx-no-bind": [0],
     "react/jsx-no-duplicate-props": 2,
