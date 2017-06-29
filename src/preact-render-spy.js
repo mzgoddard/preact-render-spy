@@ -4,32 +4,36 @@ const isEqual = require('lodash.isequal');
 const {isWhere} = require('./is-where');
 const {selToWhere} = require('./sel-to-where');
 
-const SPY_PRIVATE_KEY = 'SPY_PRIVATE_KEY';
+const config = {
+  SPY_PRIVATE_KEY: 'SPY_PRIVATE_KEY',
+};
 
-const spyWalk = (spy, vdom) => {
+const spyWalk = (spy, vdom, depth) => {
   if (!vdom) {
     return vdom;
   }
   if (typeof vdom.nodeName === 'function' && !vdom.nodeName.isSpy) {
     vdom = Object.assign({}, vdom, {
-      nodeName: createSpy(spy, vdom.nodeName),
+      nodeName: (depth > spy.renderedDepth ? createNoopSpy : createSpy)(
+        spy, vdom.nodeName,
+      ),
       attributes: Object.assign({}, vdom.attributes, {
-        [SPY_PRIVATE_KEY]: vdom,
+        [config.SPY_PRIVATE_KEY]: {vdom, depth},
       }),
     });
   }
   else if (vdom.children) {
     vdom = Object.assign({}, vdom, {
-      children: vdom.children.map(child => spyWalk(spy, child)),
+      children: vdom.children.map(child => spyWalk(spy, child, depth)),
     });
   }
   return vdom;
 };
 
 const popSpyKey = _props => {
-  const spyKey = _props[SPY_PRIVATE_KEY];
-  delete _props[SPY_PRIVATE_KEY];
-  return [spyKey, _props];
+  const {vdom: spyKey, depth: spyDepth} = _props[config.SPY_PRIVATE_KEY];
+  delete _props[config.SPY_PRIVATE_KEY];
+  return [spyKey, spyDepth, _props];
 };
 
 const setVDom = (spy, spyKey, vdom) => {
@@ -37,25 +41,44 @@ const setVDom = (spy, spyKey, vdom) => {
   return vdom;
 };
 
+const NoopSpy = (props) => {nodeName: 'span'};
+
+const _createNoopSpy = (spy, Component) => {
+  return function(_props) {
+    const [spyKey, depth, props] = popSpyKey(_props);
+    const vdom = {
+      nodeName: NoopSpy,
+      attributes: Object.assign({
+        component: Component,
+      }, props),
+      children: props.children,
+    };
+    delete vdom.attributes.children;
+    return vdom;
+  };
+};
+
 const createFuncSpy = (spy, Component) => {
   return function(_props, ...args) {
-    const [spyKey, props] = popSpyKey(_props);
+    const [spyKey, depth, props] = popSpyKey(_props);
     const output = Component.call(this, props, ...args);
-    return spyWalk(spy, setVDom(spy, spyKey, output));
+    return spyWalk(spy, setVDom(spy, spyKey, output), depth + 1);
   };
 };
 
 const createClassSpy = (spy, Component) => {
   class Spy extends Component {
     constructor(_props, ...args) {
-      const [spyKey, props] = popSpyKey(_props);
+      const [spyKey, spyDepth, props] = popSpyKey(_props);
       super(props, ...args);
       spy.keyMap.set(this, spyKey);
+      spy.depthMap.set(this, spyDepth);
     }
 
     componentWillReceiveProps(_props, ...args) {
-      const [spyKey, props] = popSpyKey(_props);
+      const [spyKey, spyDepth, props] = popSpyKey(_props);
       spy.keyMap.set(this, spyKey);
+      spy.depthMap.set(this, spyDepth);
       if (super.componentWillReceiveProps) {
         super.componentWillReceiveProps(props, ...args);
       }
@@ -63,9 +86,21 @@ const createClassSpy = (spy, Component) => {
 
     render(...args) {
       const spyKey = spy.keyMap.get(this);
-      return spyWalk(spy, setVDom(spy, spyKey, super.render(...args)));
+      const spyDepth = spy.depthMap.get(this);
+      return spyWalk(spy, setVDom(spy, spyKey, super.render(...args)), spyDepth + 1);
     }
   }
+  return Spy;
+};
+
+const createNoopSpy = (spy, Component) => {
+  if (spy.componentNoopMap.get(Component)) {return spy.componentNoopMap.get(Component);}
+
+  const Spy = _createNoopSpy(spy, Component);
+  Spy.isSpy = true;
+
+  spy.componentNoopMap.set(Component, Spy);
+
   return Spy;
 };
 
@@ -88,9 +123,13 @@ const createSpy = (spy, Component) => {
 };
 
 class SpyWrapper {
-  constructor(Component) {
+  constructor({depth}) {
+    this.renderedDepth = (depth || Infinity) - 1;
+
     this.keyMap = new Map();
+    this.depthMap = new Map();
     this.componentMap = new Map();
+    this.componentNoopMap = new Map();
     this.vdomMap = new Map();
     this.fragment = document.createDocumentFragment();
   }
@@ -101,7 +140,7 @@ class SpyWrapper {
 
   render(vdom) {
     this.component = render(
-      spyWalk(this, setVDom(this, 'root', vdom)),
+      spyWalk(this, setVDom(this, 'root', vdom), 0),
       this.fragment
     );
     return this;
@@ -176,6 +215,17 @@ class FindWrapper {
   }
 
   /**
+   * Return an object copy of the attributes from the first node that matched.
+   */
+  attrs() {
+    if (!this[0]) {
+      return null;
+    }
+
+    return Object.assign({}, this[0].attributes);
+  }
+
+  /**
    * Return the text of all nested children concatenated together.
    */
   text() {
@@ -183,7 +233,7 @@ class FindWrapper {
     // Filter for strings (text nodes)
     .filter(value => typeof value === 'string')
     // Concatenate all strings together
-    .reduce((carry, value) => carry + value);
+    .join('');
   }
 
   contains(vdom) {
@@ -209,8 +259,13 @@ class FindWrapper {
   }
 }
 
-const renderSpy = vdom => {
-  return new SpyWrapper().render(vdom);
-};
+const deep = (vdom, {depth = Infinity} = {}) => new SpyWrapper({depth}).render(vdom);
+const shallow = vdom => deep(vdom, {depth: 1});
 
-module.exports = renderSpy;
+exports = module.exports = deep;
+
+exports.config = config;
+exports.deep = deep;
+exports.default = deep;
+exports.render = deep;
+exports.shallow = shallow
