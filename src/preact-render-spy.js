@@ -262,10 +262,10 @@ class FindWrapper {
 const deep = (vdom, {depth = Infinity} = {}) => new SpyWrapper({depth}).render(vdom);
 const shallow = vdom => deep(vdom, {depth: 1});
 
-module.exports = {
-  config,
-  deep,
-  default: deep,
-  render: deep,
-  shallow
-};
+exports = module.exports = deep;
+
+exports.config = config;
+exports.deep = deep;
+exports.default = deep;
+exports.render = deep;
+exports.shallow = shallow
