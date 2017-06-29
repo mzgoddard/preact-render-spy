@@ -40,12 +40,28 @@ is set to `Infinity`, and we provide another renderer called `shallow` to render
 Creates a new `RenderContext` and renders using `opts.depth` to specify how many components deep
 it should allow the renderer to render.  Also exported as `render` and `default`.
 
+Example:
+```jsx
+const Deeper = () => <div>Until Infinity!</div>;
+const Second = () => <Deeper />;
+const First = () => <Second />;
+
+let context;
+context = deep(<First />);
+expect(context.find('div').text()).toBe('Until Infinity!');
+
+context = deep(<First />, { depth: 2 });
+// We rendered First and Second, but not Deeper, so we never render a <div>
+expect(context.find('div').length).toBe(0);
+```
+
 ### `shallow(jsx)`
-Alias for `deep(jsx, {depth: 1})`
+Creates a new `RenderContext` with `{ depth: 1 }`.
 
 ### `RenderContext#find(selector)`
 Given a rendered context, `find` accepts a "css like" language of selectors to search through the
-rendered vdom for given nodes.
+rendered vdom for given nodes.  **NOTE:** We only support this very limited set of "selectors", and no nesting.
+We may expand this selector language in future versions, but it acheives our goals so far!
 
 * `find('.selector')` - searches for any nodes with `class` or `className` attribute that matches `selector`
 * `find('#selector')` - searches for any nodes with an `id` attribute that matches `selector`
@@ -57,7 +73,19 @@ rendered vdom for given nodes.
 This will return you a `FindWrapper` which has other useful methods for testing.
 
 ### `RenderContext#render(jsx)`
-Re-renders the root level jsx node using the same depth initially requested.
+Re-renders the root level jsx node using the same depth initially requested.  **NOTE:** When preact re-renders this way,
+it will not reuse components, so if you want to test `componentWillReceiveProps` you will need to use a test wrapper component.
+
+Example:
+
+```jsx
+const Node = ({name}) => <div>{name}</div>
+const context = shallow(<Node name="example" />);
+expect(context.find('div').text()).toBe('example');
+
+context.render(<Node name="second" />);
+expect(context.find('div').text()).toBe('second');
+```
 
 ### `FindWrapper`
 Contains a selection of nodes from `RenderContext#find(selector)`.
