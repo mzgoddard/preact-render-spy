@@ -1,9 +1,6 @@
 const {join} = require('path');
 
-const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
-const webpackif = require('webpack-if');
-
-module.exports = webpackif({
+module.exports = ({
   context: __dirname,
   entry: './src/entry',
   output: {
@@ -24,7 +21,4 @@ module.exports = webpackif({
       },
     ],
   },
-  plugins: [
-    new HardSourceWebpackPlugin(),
-  ],
 });
