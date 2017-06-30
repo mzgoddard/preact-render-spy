@@ -7,6 +7,10 @@ preact-render-spy is a package designed to cover many of the use cases for testi
 preact components.  The API is roughly modeled after enzyme, but we do not support
 as many options currently.
 
+## Support:
+
+We do our best to support Node.JS v6.11.0 and up, and speficially testing with jest, though other test runners should have no problems.
+
 ## Expressive Testing Example:
 
 ```jsx
