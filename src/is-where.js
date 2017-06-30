@@ -17,6 +17,16 @@ const _isWhere = (where, target) => {
         all = false;
       }
     }
+    else if (key === 'class') {
+      let attr = target.class || target.className;
+      if (typeof attr === 'object') {
+        attr = Object.keys(attr).filter(key => attr[key]);
+      }
+      else if (typeof attr === 'string') {
+        attr = attr.split(/\s+/);
+      }
+      all = all && attr && attr.indexOf(value) !== -1;
+    }
     else if (value === null) {
       all = all && key in target;
     }
