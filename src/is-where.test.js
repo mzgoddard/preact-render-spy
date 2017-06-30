@@ -6,6 +6,17 @@ it('tests tag names', () => {
   expect(isWhere({nodeName: 'div'})(<div />)).toBeTruthy();
 });
 
+it('tests class names', () => {
+  const testClass = isWhere({attributes: {class: 'test'}});
+  expect(testClass(<div class="test" />)).toBeTruthy();
+  expect(testClass(<div class="nottest" />)).toBeFalsy();
+  expect(testClass(<div class="nottest and test" />)).toBeTruthy();
+  expect(testClass(<div class={{nottest: false, test: true }} />)).toBeTruthy();
+  expect(testClass(<div class={{test: false}} />)).toBeFalsy();
+  expect(testClass(<div className="test" />)).toBeTruthy();
+  expect(testClass(<div className={{test: true}} />)).toBeTruthy();
+});
+
 it('tests Component names', () => {
   class Node extends Component {}
   const NodelessConst = () => {};

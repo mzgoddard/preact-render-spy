@@ -1,39 +1,55 @@
 const entries = require('object.entries');
 
 const _isWhere = (where, target) => {
-  let all = true;
-  for (let [key, value] of entries(where)) {
+  for (const [key, value] of entries(where)) {
     if (typeof value === 'object') {
-      all = all && Boolean(target[key]) && _isWhere(value, target[key]);
+      if (!(Boolean(target[key]) && _isWhere(value, target[key]))) {
+        return false;
+      }
     }
     else if (key === 'nodeName') {
       if (typeof target.nodeName === 'function') {
-        all = all && (target.nodeName.name === value || target.nodeName.displayName === value);
+        if (target.nodeName.name !== value && target.nodeName.displayName !== value) {
+          return false;
+        }
       }
       else if (/[a-z]/.test(value[0])) {
-        all = all && target.nodeName === value;
+        if (target.nodeName !== value) {
+          return false;
+        }
       }
       else {
-        all = false;
+        return false;
+      }
+    }
+    else if (key === 'class') {
+      let attr = target.class || target.className;
+      if (typeof attr === 'object') {
+        attr = Object.keys(attr).filter(key => attr[key]);
+      }
+      else if (typeof attr === 'string') {
+        attr = attr.split(/\s+/);
+      }
+
+      if (!attr || attr.indexOf(value) === -1) {
+        return false;
       }
     }
     else if (value === null) {
-      all = all && key in target;
+      if (!(key in target)) {
+        return false;
+      }
     }
     else if (Array.isArray(value)) {
-      all = value.reduce((carry, value) => (
-        carry && target[key].indexOf(value) !== -1
-      ), all);
+      if (!value.some(test => target[key] === test)) {
+        return false;
+      }
     }
-    else {
-      all = all && Boolean(target) && target[key] === value;
-    }
-    // break the loop if we hit any falsyness
-    if (!all) {
-      break;
+    else if (!target || target[key] !== value) {
+      return false;
     }
   }
-  return all;
+  return true;
 };
 
 const isWhere = where => value => _isWhere(where, value);
