@@ -1,7 +1,7 @@
 const entries = require('object.entries');
 
 const _isWhere = (where, target) => {
-  for (let [key, value] of entries(where)) {
+  for (const [key, value] of entries(where)) {
     if (typeof value === 'object') {
       if (!(Boolean(target[key]) && _isWhere(value, target[key]))) {
         return false;
