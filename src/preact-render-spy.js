@@ -173,6 +173,10 @@ class RenderContext {
   simulate(event, ...args) {
     return new FindWrapper(this, [this.vdomMap.get('root')]).simulate(event, ...args);
   }
+
+  output() {
+    return new FindWrapper(this, [this.vdomMap.get('root')]).output();
+  }
 }
 
 const vdomIter = function* (vdomMap, vdom) {
@@ -294,6 +298,18 @@ class FindWrapper {
       this.context,
       Array.from(this).filter(isWhere(selToWhere(selector)))
     );
+  }
+
+  output() {
+    if (this.length > 1 || this.length === 0) {
+      throw new Error('preact-render-spy: Must have only 1 result for .output().');
+    }
+
+    if (typeof this[0].nodeName !== 'function') {
+      throw new Error('preact-render-spy: Must have a result of a preact class or function component for .output()');
+    }
+
+    return this.context.vdomMap.get(this[0]);
   }
 }
 
