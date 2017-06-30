@@ -134,16 +134,44 @@ class RenderContext {
     this.fragment = document.createDocumentFragment();
   }
 
-  find(selector) {
-    return new FindWrapper(this, [this.vdomMap.get('root')], selector);
-  }
-
   render(vdom) {
     this.component = render(
       spyWalk(this, setVDom(this, 'root', vdom), 0),
       this.fragment
     );
     return this;
+  }
+
+  find(selector) {
+    return new FindWrapper(this, [this.vdomMap.get('root')], selector);
+  }
+
+  filter(selector) {
+    return new FindWrapper(this, [this.vdomMap.get('root')]).filter(selector);
+  }
+
+  attr(name) {
+    return new FindWrapper(this, [this.vdomMap.get('root')]).attr(name);
+  }
+
+  attrs() {
+    return new FindWrapper(this, [this.vdomMap.get('root')]).attrs();
+  }
+
+  at(index) {
+    return new FindWrapper(this, [this.vdomMap.get('root')]).at(index);
+  }
+
+  text() {
+    return new FindWrapper(this, [this.vdomMap.get('root')]).text();
+  }
+
+  contains(vdom) {
+    return new FindWrapper(this, [this.vdomMap.get('root')]).contains(vdom);
+  }
+
+  simulate(event, ...args) {
+    return new FindWrapper(this, [this.vdomMap.get('root')]).simulate(event, ...args);
   }
 }
 
@@ -191,18 +219,25 @@ class FindWrapper {
   }
 
   at(index) {
+    if (index >= this.length) {
+      throw new Error(`preact-render-spy: Must have enough results for .at(${index}).`);
+    }
+
     return new FindWrapper(this.context, [this[index]]);
   }
 
   attr(name) {
-    for (const item of Array.from(this)) {
-      if (
-        typeof item === 'object' &&
-        item.attributes &&
-        item.attributes[name]
-      ) {
-        return item.attributes[name];
-      }
+    if (this.length > 1 || this.length === 0) {
+      throw new Error(`preact-render-spy: Must have only 1 result for .attr(${name})`);
+    }
+
+    const item = this[0];
+    if (
+      typeof item === 'object' &&
+      item.attributes &&
+      item.attributes[name]
+    ) {
+      return item.attributes[name];
     }
   }
 
@@ -210,8 +245,8 @@ class FindWrapper {
    * Return an object copy of the attributes from the first node that matched.
    */
   attrs() {
-    if (!this[0]) {
-      return null;
+    if (this.length > 1 || this.length === 0) {
+      throw new Error('preact-render-spy: Must have only 1 result for .attrs().');
     }
 
     return Object.assign({}, this[0].attributes);
@@ -222,9 +257,9 @@ class FindWrapper {
    */
   text() {
     return Array.from(vdomWalk(this.context.vdomMap, Array.from(this)))
-    // Filter for strings (text nodes)
+      // Filter for strings (text nodes)
       .filter(value => typeof value === 'string')
-    // Concatenate all strings together
+      // Concatenate all strings together
       .join('');
   }
 
@@ -248,6 +283,17 @@ class FindWrapper {
       }
     }
     rerender();
+  }
+
+  find(selector) {
+    return new FindWrapper(this.context, Array.from(this), selector);
+  }
+
+  filter(selector) {
+    return new FindWrapper(
+      this.context,
+      Array.from(this).filter(isWhere(selToWhere(selector)))
+    );
   }
 }
 
