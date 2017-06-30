@@ -206,11 +206,13 @@ const vdomFilter = (pred, vdomMap, vdom) => {
 
 class FindWrapper {
   constructor(context, _iter, selector) {
-    this.context = context;
+    // Set a non-enumerable property for context. In case a user does an deep
+    // equal comparison this removes the chance for recursive comparisons.
+    Object.defineProperty(this, 'context', {enumerable: false, value: context});
     this.length = 0;
     let iter = _iter;
     if (selector) {
-      this.selector = selector;
+      Object.defineProperty(this, 'selector', {enumerable: false, value: selector});
       iter = [].concat(...Array.from(iter, root => (
         Array.from(vdomFilter(isWhere(selToWhere(selector)), context.vdomMap, root))
       )));
