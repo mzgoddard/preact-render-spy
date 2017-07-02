@@ -122,63 +122,6 @@ const createSpy = (context, Component) => {
   return Spy;
 };
 
-class RenderContext {
-  constructor({depth}) {
-    this.renderedDepth = (depth || Infinity) - 1;
-
-    this.keyMap = new Map();
-    this.depthMap = new Map();
-    this.componentMap = new Map();
-    this.componentNoopMap = new Map();
-    this.vdomMap = new Map();
-    this.fragment = document.createDocumentFragment();
-  }
-
-  render(vdom) {
-    this.component = render(
-      spyWalk(this, setVDom(this, 'root', vdom), 0),
-      this.fragment
-    );
-    return this;
-  }
-
-  find(selector) {
-    return new FindWrapper(this, [this.vdomMap.get('root')], selector);
-  }
-
-  filter(selector) {
-    return new FindWrapper(this, [this.vdomMap.get('root')]).filter(selector);
-  }
-
-  attr(name) {
-    return new FindWrapper(this, [this.vdomMap.get('root')]).attr(name);
-  }
-
-  attrs() {
-    return new FindWrapper(this, [this.vdomMap.get('root')]).attrs();
-  }
-
-  at(index) {
-    return new FindWrapper(this, [this.vdomMap.get('root')]).at(index);
-  }
-
-  text() {
-    return new FindWrapper(this, [this.vdomMap.get('root')]).text();
-  }
-
-  contains(vdom) {
-    return new FindWrapper(this, [this.vdomMap.get('root')]).contains(vdom);
-  }
-
-  simulate(event, ...args) {
-    return new FindWrapper(this, [this.vdomMap.get('root')]).simulate(event, ...args);
-  }
-
-  output() {
-    return new FindWrapper(this, [this.vdomMap.get('root')]).output();
-  }
-}
-
 const vdomIter = function* (vdomMap, vdom) {
   if (!vdom) {
     return;
@@ -319,6 +262,62 @@ class FindWrapper {
     }
 
     return this.context.vdomMap.get(this[0]);
+  }
+}
+
+class RenderContext extends FindWrapper {
+  constructor({depth}) {
+    super(null, []);
+
+    Object.defineProperties(this, {
+      context: {
+        value: this,
+        configurable: true,
+        enumerable: false,
+      },
+      renderedDepth: {
+        value: (depth || Infinity) - 1,
+        enumerable: false,
+      },
+      keyMap: {
+        value: new Map(),
+        enumerable: false,
+      },
+      depthMap: {
+        value: new Map(),
+        enumerable: false,
+      },
+      componentMap: {
+        value: new Map(),
+        enumerable: false,
+      },
+      componentNoopMap: {
+        value: new Map(),
+        enumerable: false,
+      },
+      vdomMap: {
+        value: new Map(),
+        enumerable: false,
+      },
+      fragment: {
+        value: document.createDocumentFragment(),
+        enumerable: false,
+      },
+    });
+  }
+
+  render(vdom) {
+    this[0] = vdom;
+    this.length = 1;
+    Object.defineProperty(this, 'component', {
+      enumerable: false,
+      configurable: true,
+      value: render(
+        spyWalk(this, setVDom(this, 'root', vdom), 0),
+        this.fragment
+      ),
+    });
+    return this;
   }
 }
 
