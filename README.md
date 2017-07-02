@@ -74,7 +74,11 @@ We may expand this selector language in future versions, but it acheives our goa
   this wills search for function/classes whos `name` is `Selector`, or `displayName` is `Selector`.
   If the `Selector` starts with a lower case letter, it will also check for tags like `div`.
 
-This will return you a `FindWrapper` which has other useful methods for testing.
+This will return you a [`FindWrapper`](#findwrapper) which has other useful methods for testing.
+
+### `RenderContext` extends `FindWrapper`
+
+Like [`#find(selector)`](#rendercontextfindselector) `RenderContext` has the rest of `FindWrapper`'s methods.
 
 ### `RenderContext#render(jsx)`
 Re-renders the root level jsx node using the same depth initially requested.  **NOTE:** When preact re-renders this way,
@@ -117,7 +121,17 @@ Returns the flattened string of any text children of any child component.
 Looks for an attribute properly named `onEvent` or `onEventCapture` and calls it, passing the arguments.
 
 ### `FindWrapper#output()`
-Requires a single Component or functional node.  Returns the raw vdom output of the given component.
+Requires a single Component or functional node. Returns the raw vdom output of the given component.
+
+### `FindWrapper#filter(selector)`
+Returns a new `FindWrapper` with a subset of the previously selected elements given the selector argument.
+
+Uses the same possible selectors as [`RenderContext#find(selector)`](#rendercontextfindselector).
+
+### `FindWrapper#find(selector)`
+Selects descendents of the elements previously selected. Returns a new `FindWrapper` with the newly selected elements.
+
+Uses the same possible selectors as [`RenderContext#find(selector)`](#rendercontextfindselector).
 
 ## Examples
 
