@@ -85,7 +85,7 @@ const sharedTests = (name, func) => {
 
   it(`${name}: renders components with null children`, () => {
     const context = func(<div><NullStateless />text</div>);
-    expect(context.find('div').text()).toBe('text');
+    expect(context.text()).toBe('text');
   });
 
   it(`${name}: at() returns the indexed member`, () => {
@@ -93,8 +93,8 @@ const sharedTests = (name, func) => {
     expect(() => context.at(0)).not.toThrow();
     expect(() => context.at(1)).toThrow();
     expect(context.at(0)[0]).toEqual(<div><div /><div /></div>);
-    expect(() => context.find('div').at(2)).not.toThrow();
-    expect(() => context.find('div').at(3)).toThrow();
+    expect(() => context.find('div').at(1)).not.toThrow();
+    expect(() => context.find('div').at(2)).toThrow();
     expect(context.find('div').at(1)[0]).toEqual(<div />);
   });
 
@@ -134,7 +134,6 @@ const sharedTests = (name, func) => {
     const context = func(<DivChildren><span /></DivChildren>);
     expect(() => context.find('div').output()).toThrow();
     expect(context.output()).toEqual(<div><span /></div>);
-    expect(context.find('DivChildren').output()).toEqual(<div><span /></div>);
   });
 
   it(`${name}: simulate an event`, () => {

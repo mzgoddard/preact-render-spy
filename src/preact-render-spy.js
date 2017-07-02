@@ -200,15 +200,22 @@ const vdomWalk = function* (vdomMap, iter) {
   }
 };
 
+const skip = function* (count, iter) {
+  for (let i = 0; i < count; i++) {
+    if (iter.next().done) {break;}
+  }
+  yield* iter;
+};
+
 const vdomFilter = (pred, vdomMap, vdom) => {
-  return Array.from(vdomIter(vdomMap, vdom)).filter(pred);
+  return Array.from(skip(1, vdomIter(vdomMap, vdom))).filter(pred);
 };
 
 class FindWrapper {
   constructor(context, _iter, selector) {
     // Set a non-enumerable property for context. In case a user does an deep
     // equal comparison this removes the chance for recursive comparisons.
-    Object.defineProperty(this, 'context', {enumerable: false, value: context});
+    Object.defineProperty(this, 'context', {configurable: true, enumerable: false, value: context});
     this.length = 0;
     let iter = _iter;
     if (selector) {
