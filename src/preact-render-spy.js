@@ -122,31 +122,6 @@ const createSpy = (context, Component) => {
   return Spy;
 };
 
-class RenderContext {
-  constructor({depth}) {
-    this.renderedDepth = (depth || Infinity) - 1;
-
-    this.keyMap = new Map();
-    this.depthMap = new Map();
-    this.componentMap = new Map();
-    this.componentNoopMap = new Map();
-    this.vdomMap = new Map();
-    this.fragment = document.createDocumentFragment();
-  }
-
-  find(selector) {
-    return new FindWrapper(this, [this.vdomMap.get('root')], selector);
-  }
-
-  render(vdom) {
-    this.component = render(
-      spyWalk(this, setVDom(this, 'root', vdom), 0),
-      this.fragment
-    );
-    return this;
-  }
-}
-
 const vdomIter = function* (vdomMap, vdom) {
   if (!vdom) {
     return;
@@ -168,17 +143,26 @@ const vdomWalk = function* (vdomMap, iter) {
   }
 };
 
+const skip = function* (count, iter) {
+  for (let i = 0; i < count; i++) {
+    if (iter.next().done) {break;}
+  }
+  yield* iter;
+};
+
 const vdomFilter = (pred, vdomMap, vdom) => {
-  return Array.from(vdomIter(vdomMap, vdom)).filter(pred);
+  return Array.from(skip(1, vdomIter(vdomMap, vdom))).filter(pred);
 };
 
 class FindWrapper {
   constructor(context, _iter, selector) {
-    this.context = context;
+    // Set a non-enumerable property for context. In case a user does an deep
+    // equal comparison this removes the chance for recursive comparisons.
+    Object.defineProperty(this, 'context', {configurable: true, enumerable: false, value: context});
     this.length = 0;
     let iter = _iter;
     if (selector) {
-      this.selector = selector;
+      Object.defineProperty(this, 'selector', {enumerable: false, value: selector});
       iter = [].concat(...Array.from(iter, root => (
         Array.from(vdomFilter(isWhere(selToWhere(selector)), context.vdomMap, root))
       )));
@@ -191,18 +175,25 @@ class FindWrapper {
   }
 
   at(index) {
+    if (index >= this.length) {
+      throw new Error(`preact-render-spy: Must have enough results for .at(${index}).`);
+    }
+
     return new FindWrapper(this.context, [this[index]]);
   }
 
   attr(name) {
-    for (const item of Array.from(this)) {
-      if (
-        typeof item === 'object' &&
-        item.attributes &&
-        item.attributes[name]
-      ) {
-        return item.attributes[name];
-      }
+    if (this.length > 1 || this.length === 0) {
+      throw new Error(`preact-render-spy: Must have only 1 result for .attr(${name})`);
+    }
+
+    const item = this[0];
+    if (
+      typeof item === 'object' &&
+      item.attributes &&
+      item.attributes[name]
+    ) {
+      return item.attributes[name];
     }
   }
 
@@ -210,8 +201,8 @@ class FindWrapper {
    * Return an object copy of the attributes from the first node that matched.
    */
   attrs() {
-    if (!this[0]) {
-      return null;
+    if (this.length > 1 || this.length === 0) {
+      throw new Error('preact-render-spy: Must have only 1 result for .attrs().');
     }
 
     return Object.assign({}, this[0].attributes);
@@ -222,9 +213,9 @@ class FindWrapper {
    */
   text() {
     return Array.from(vdomWalk(this.context.vdomMap, Array.from(this)))
-    // Filter for strings (text nodes)
+      // Filter for strings (text nodes)
       .filter(value => typeof value === 'string')
-    // Concatenate all strings together
+      // Concatenate all strings together
       .join('');
   }
 
@@ -248,6 +239,85 @@ class FindWrapper {
       }
     }
     rerender();
+  }
+
+  find(selector) {
+    return new FindWrapper(this.context, Array.from(this), selector);
+  }
+
+  filter(selector) {
+    return new FindWrapper(
+      this.context,
+      Array.from(this).filter(isWhere(selToWhere(selector)))
+    );
+  }
+
+  output() {
+    if (this.length > 1 || this.length === 0) {
+      throw new Error('preact-render-spy: Must have only 1 result for .output().');
+    }
+
+    if (typeof this[0].nodeName !== 'function') {
+      throw new Error('preact-render-spy: Must have a result of a preact class or function component for .output()');
+    }
+
+    return this.context.vdomMap.get(this[0]);
+  }
+}
+
+class RenderContext extends FindWrapper {
+  constructor({depth}) {
+    super(null, []);
+
+    Object.defineProperties(this, {
+      context: {
+        value: this,
+        configurable: true,
+        enumerable: false,
+      },
+      renderedDepth: {
+        value: (depth || Infinity) - 1,
+        enumerable: false,
+      },
+      keyMap: {
+        value: new Map(),
+        enumerable: false,
+      },
+      depthMap: {
+        value: new Map(),
+        enumerable: false,
+      },
+      componentMap: {
+        value: new Map(),
+        enumerable: false,
+      },
+      componentNoopMap: {
+        value: new Map(),
+        enumerable: false,
+      },
+      vdomMap: {
+        value: new Map(),
+        enumerable: false,
+      },
+      fragment: {
+        value: document.createDocumentFragment(),
+        enumerable: false,
+      },
+    });
+  }
+
+  render(vdom) {
+    this[0] = vdom;
+    this.length = 1;
+    Object.defineProperty(this, 'component', {
+      enumerable: false,
+      configurable: true,
+      value: render(
+        spyWalk(this, setVDom(this, 'root', vdom), 0),
+        this.fragment
+      ),
+    });
+    return this;
   }
 }
 
