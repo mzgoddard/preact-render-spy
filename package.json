@@ -1,15 +1,34 @@
 {
   "name": "preact-render-spy",
   "version": "1.0.0-rc.0",
-  "description": "",
+  "description": "Render preact components with access to the produced virtual dom for testing.",
   "main": "index.js",
   "scripts": {
     "test": "jest-webpack",
     "pretest": "npm run lint",
     "lint": "eslint --ignore-pattern='!.eslintrc.js' --ext js,jsx src .eslintrc.js *.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "preact",
+    "vdom",
+    "jsx",
+    "testing",
+    "test"
+  ],
+  "author": {
+    "name": "Michael \"Z\" Goddard",
+    "email": "mzgoddard@gmail.com"
+  },
+  "contributors": [
+    {
+      "name": "Michael \"Z\" Goddard",
+      "email": "mzgoddard@gmail.com"
+    },
+    {
+      "name": "Corey Frang",
+      "email": "gnarf37@gmail.com"
+    }
+  ],
   "license": "ISC",
   "devDependencies": {
     "@mzgoddard/jest-webpack": "^0.0.7",
