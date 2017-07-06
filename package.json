@@ -1,6 +1,6 @@
 {
   "name": "preact-render-spy",
-  "version": "0.0.2",
+  "version": "1.0.0-rc.0",
   "description": "",
   "main": "index.js",
   "scripts": {
