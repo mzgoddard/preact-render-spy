@@ -2,6 +2,10 @@
   "name": "preact-render-spy",
   "version": "1.0.0-rc.1",
   "description": "Render preact components with access to the produced virtual dom for testing.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mzgoddard/preact-render-spy"
+  },
   "main": "index.js",
   "scripts": {
     "test": "jest-webpack",
