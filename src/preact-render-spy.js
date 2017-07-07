@@ -12,11 +12,10 @@ const spyWalk = (context, vdom, depth) => {
   if (!vdom) {
     return vdom;
   }
+  const spyCreator = depth > context.renderedDepth ? createNoopSpy : createSpy;
   if (typeof vdom.nodeName === 'function' && !vdom.nodeName.isSpy) {
     vdom = Object.assign({}, vdom, {
-      nodeName: (depth > context.renderedDepth ? createNoopSpy : createSpy)(
-        context, vdom.nodeName,
-      ),
+      nodeName: spyCreator(context, vdom.nodeName),
       attributes: Object.assign({}, vdom.attributes, {
         [config.SPY_PRIVATE_KEY]: {vdom, depth},
       }),
