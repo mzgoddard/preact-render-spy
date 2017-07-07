@@ -38,7 +38,7 @@
   ],
   "license": "ISC",
   "devDependencies": {
-    "@mzgoddard/jest-webpack": "^0.0.7",
+    "@mzgoddard/jest-webpack": "^0.0.12",
     "babel-core": "^6.25.0",
     "babel-eslint": "^7.2.3",
     "babel-loader": "^7.0.0",
