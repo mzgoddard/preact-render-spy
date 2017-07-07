@@ -8,9 +8,14 @@
   },
   "main": "index.js",
   "scripts": {
-    "test": "jest-webpack",
+    "test-jest": "jest --config jest.config.json",
+    "test-jest-webpack": "jest-webpack",
+    "test": "npm run test-jest && npm run test-jest-webpack",
     "pretest": "npm run lint",
     "lint": "eslint --ignore-pattern='!.eslintrc.js' --ext js,jsx src .eslintrc.js *.js"
+  },
+  "jest": {
+    "transform": {}
   },
   "keywords": [
     "preact",
@@ -35,11 +40,10 @@
   ],
   "license": "ISC",
   "devDependencies": {
-    "@mzgoddard/jest-webpack": "^0.0.7",
+    "@mzgoddard/jest-webpack": "^0.0.12",
     "babel-core": "^6.25.0",
     "babel-eslint": "^7.2.3",
     "babel-loader": "^7.0.0",
-    "babel-preset-env": "^1.5.2",
     "babel-preset-jest": "^20.0.3",
     "babel-preset-preact": "^1.1.0",
     "eslint": "^4.1.1",
@@ -53,7 +57,7 @@
     "preact": "^8.1.0"
   },
   "dependencies": {
-    "object.entries": "^1.0.4",
-    "lodash.isequal": "^4.5.0"
+    "lodash.isequal": "^4.5.0",
+    "object.entries": "^1.0.4"
   }
 }

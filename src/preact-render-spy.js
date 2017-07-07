@@ -107,7 +107,7 @@ const createSpy = (context, Component) => {
   if (context.componentMap.get(Component)) {return context.componentMap.get(Component);}
 
   let Spy;
-  if (!Component.prototype.render) {
+  if (!Component.prototype || !Component.prototype.render) {
     Spy = createFuncSpy(context, Component);
   }
   else {
