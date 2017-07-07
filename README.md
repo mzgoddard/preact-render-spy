@@ -1,11 +1,10 @@
 # preact-render-spy
 
-[![Build Status](https://travis-ci.org/mzgoddard/preact-render-spy.svg?branch=master)](https://travis-ci.org/mzgoddard/preact-render-spy)
-
-
 preact-render-spy is a package designed to cover many of the use cases for testing
 preact components.  The API is roughly modeled after enzyme, but we do not support
 as many options currently.
+
+[![Build Status](https://travis-ci.org/mzgoddard/preact-render-spy.svg?branch=master)](https://travis-ci.org/mzgoddard/preact-render-spy)
 
 ## Support:
 
