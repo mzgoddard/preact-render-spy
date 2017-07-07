@@ -47,7 +47,14 @@ module.exports = {
     "jest/no-focused-tests": 1,
     "jest/no-identical-title": 2,
     "camelcase": 0,
-    "comma-dangle": [2, "always-multiline"],
+    "comma-dangle": [2, {
+      "arrays": "always-multiline",
+      "objects": "always-multiline",
+      "imports": "always-multiline",
+      "exports": "always-multiline",
+      // make eslint catch any trailing comma in function argument list as an error
+      "functions": "never",
+    }],
     "comma-style": 2,
     "constructor-super": 2,
     "eqeqeq": 1,
