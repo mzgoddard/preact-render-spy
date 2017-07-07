@@ -42,7 +42,7 @@ const sharedTests = (name, func) => {
 
   const NullStateless = () => null;
 
-  it(`${name}: renders into fragment`, async () => {
+  it(`${name}: renders into fragment`, () => {
     const context = func(<Div />);
     expect(context.fragment.children.length).toBe(1);
     expect(context.fragment.children[0].tagName).toBe('DIV');
@@ -50,19 +50,19 @@ const sharedTests = (name, func) => {
     expect(context.find('div').contains(<div />)).toBeTruthy();
   });
 
-  it(`${name}: renders props`, async () => {
+  it(`${name}: renders props`, () => {
     const context = func(<DivChildren>node</DivChildren>);
     expect(context.find('div').length).toBe(1);
     expect(context.find('div').text('node')).toBeTruthy();
   });
 
-  it(`${name}: renders changes`, async () => {
+  it(`${name}: renders changes`, () => {
     const context = func(<DivChildren>node</DivChildren>);
     context.render(<DivChildren>node2</DivChildren>);
     expect(context.find('div').contains('node2')).toBeTruthy();
   });
 
-  it(`${name}: renders change on click`, async () => {
+  it(`${name}: renders change on click`, () => {
     const context = func(<ClickCount />);
     expect(context.find('div').contains('0')).toBeTruthy();
     context.find('div').simulate('click');
