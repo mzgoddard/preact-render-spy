@@ -290,7 +290,7 @@ const setHiddenProp = (object, prop, value) => {
     value,
   });
   return value;
-}
+};
 
 class RenderContext extends FindWrapper {
   constructor({depth}) {
