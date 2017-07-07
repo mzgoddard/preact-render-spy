@@ -3,6 +3,23 @@ const {h, Component} = require('preact');
 const {deep, shallow} = require('./preact-render-spy');
 
 const sharedTests = (name, func) => {
+  class ReceivesProps extends Component {
+    constructor(props) {
+      super(props);
+      this.state = {value: props.value};
+    }
+
+    componentWillReceiveProps(newProps) {
+      this.setState({value: `_${newProps.value}_`});
+    }
+
+    render(props, {value}) {
+      return (
+        <div>{value}</div>
+      );
+    }
+  }
+
   class Div extends Component {
     render() {
       return <div />;
@@ -152,6 +169,13 @@ const sharedTests = (name, func) => {
     const context = func(<DivChildren><div>foo</div><div>bar</div></DivChildren>);
     expect(context.text()).toBe('foobar');
     expect(context.find('div').at(0).text()).toBe('foobar');
+  });
+
+  it(`${name}: will call componentWillReceiveProps on the 'root' node`, () => {
+    const context = func(<ReceivesProps value="test" />);
+    expect(context.text()).toBe('test');
+    context.render(<ReceivesProps value="received" />);
+    expect(context.text()).toBe('_received_');
   });
 };
 

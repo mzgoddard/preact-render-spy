@@ -1,4 +1,4 @@
-const {render, rerender} = require('preact');
+const {render, rerender, Component} = require('preact');
 const isEqual = require('lodash.isequal');
 
 const {isWhere} = require('./is-where');
@@ -153,6 +153,21 @@ const vdomFilter = (pred, vdomMap, vdom) => {
   return Array.from(skip(1, vdomIter(vdomMap, vdom))).filter(pred);
 };
 
+class ContextRootWrapper extends Component {
+  constructor({ vdom, rerenderHook }) {
+    super({ vdom, rerenderHook });
+    this.state = {vdom};
+    rerenderHook(vdom => {
+      this.setState({ vdom });
+      rerender();
+    });
+  }
+
+  render({}, {vdom}) {
+    return vdom;
+  }
+}
+
 class FindWrapper {
   constructor(context, _iter, selector) {
     // Set a non-enumerable property for context. In case a user does an deep
@@ -306,16 +321,32 @@ class RenderContext extends FindWrapper {
   }
 
   render(vdom) {
+    const spiedDom = spyWalk(this, setVDom(this, 'root', vdom), 0);
+    // Add what we need to be a FindWrapper:
     this[0] = vdom;
     this.length = 1;
-    Object.defineProperty(this, 'component', {
-      enumerable: false,
-      configurable: true,
-      value: render(
-        spyWalk(this, setVDom(this, 'root', vdom), 0),
-        this.fragment
-      ),
-    });
+
+    // If we have a root component, have it update the state
+    if (this.contextRender) {
+      this.contextRender(spiedDom);
+    } else {
+      Object.defineProperty(this, 'component', {
+        enumerable: false,
+        configurable: true,
+        value: render(
+          {
+            nodeName: ContextRootWrapper,
+            attributes: {
+              vdom: spiedDom,
+              rerenderHook: value => {
+                Object.defineProperty(this, 'contextRender', { enumerable: false, configurable: true, value });
+              },
+            },
+          },
+          this.fragment
+        ),
+      });
+    }
     return this;
   }
 }

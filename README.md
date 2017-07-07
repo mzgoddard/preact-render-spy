@@ -80,8 +80,8 @@ This will return you a [`FindWrapper`](#findwrapper) which has other useful meth
 Like [`#find(selector)`](#rendercontextfindselector) `RenderContext` has the rest of `FindWrapper`'s methods.
 
 ### `RenderContext#render(jsx)`
-Re-renders the root level jsx node using the same depth initially requested.  **NOTE:** When preact re-renders this way,
-it will not reuse components, so if you want to test `componentWillReceiveProps` you will need to use a test wrapper component.
+Re-renders the root level jsx node using the same depth initially requested.  This can be useful for testing
+`componentWillReceiveProps` hooks.
 
 Example:
 
