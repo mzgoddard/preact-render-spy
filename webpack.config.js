@@ -16,7 +16,7 @@ module.exports = ({
         exclude: [join(__dirname, 'node_modules')],
         loader: 'babel-loader',
         options: {
-          presets: ['preact', 'env'],
+          presets: ['preact'],
         },
       },
     ],
