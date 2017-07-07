@@ -157,6 +157,10 @@ class ContextRootWrapper extends Component {
   constructor({ vdom, rerenderHook }) {
     super({ vdom, rerenderHook });
     this.state = {vdom};
+
+    // We are passed a callback that we use to give the RenderContext a function
+    // that will cause the vdom to get re-rendered
+
     rerenderHook(vdom => {
       this.setState({ vdom });
       rerender();
@@ -279,45 +283,28 @@ class FindWrapper {
   }
 }
 
+const setHiddenProp = (object, prop, value) => {
+  Object.defineProperty(object, prop, {
+    enumerable: false,
+    configurable: true,
+    value,
+  });
+  return value;
+}
+
 class RenderContext extends FindWrapper {
   constructor({depth}) {
     super(null, []);
 
-    Object.defineProperties(this, {
-      context: {
-        value: this,
-        configurable: true,
-        enumerable: false,
-      },
-      renderedDepth: {
-        value: (depth || Infinity) - 1,
-        enumerable: false,
-      },
-      keyMap: {
-        value: new Map(),
-        enumerable: false,
-      },
-      depthMap: {
-        value: new Map(),
-        enumerable: false,
-      },
-      componentMap: {
-        value: new Map(),
-        enumerable: false,
-      },
-      componentNoopMap: {
-        value: new Map(),
-        enumerable: false,
-      },
-      vdomMap: {
-        value: new Map(),
-        enumerable: false,
-      },
-      fragment: {
-        value: document.createDocumentFragment(),
-        enumerable: false,
-      },
+    setHiddenProp(this, 'context', this);
+    setHiddenProp(this, 'renderedDepth', (depth || Infinity) - 1);
+    setHiddenProp(this, 'fragment', document.createDocumentFragment());
+
+    // Create our Maps
+    ['keyMap', 'depthMap', 'componentMap', 'componentNoopMap', 'vdomMap'].forEach(prop => {
+      setHiddenProp(this, prop, new Map());
     });
+
   }
 
   render(vdom) {
@@ -330,22 +317,13 @@ class RenderContext extends FindWrapper {
     if (this.contextRender) {
       this.contextRender(spiedDom);
     } else {
-      Object.defineProperty(this, 'component', {
-        enumerable: false,
-        configurable: true,
-        value: render(
-          {
-            nodeName: ContextRootWrapper,
-            attributes: {
-              vdom: spiedDom,
-              rerenderHook: value => {
-                Object.defineProperty(this, 'contextRender', { enumerable: false, configurable: true, value });
-              },
-            },
-          },
-          this.fragment
-        ),
-      });
+      render({
+        nodeName: ContextRootWrapper,
+        attributes: {
+          vdom: spiedDom,
+          rerenderHook: contextRender => setHiddenProp(this, 'contextRender', contextRender),
+        },
+      }, this.fragment);
     }
     return this;
   }
