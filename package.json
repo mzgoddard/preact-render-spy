@@ -8,7 +8,9 @@
   },
   "main": "index.js",
   "scripts": {
-    "test": "jest-webpack",
+    "test-jest": "jest --config jest.config.json",
+    "test-jest-webpack": "jest-webpack",
+    "test": "npm run test-jest && npm run test-jest-webpack",
     "pretest": "npm run lint",
     "lint": "eslint --ignore-pattern='!.eslintrc.js' --ext js,jsx src .eslintrc.js *.js"
   },
@@ -55,7 +57,7 @@
     "preact": "^8.1.0"
   },
   "dependencies": {
-    "object.entries": "^1.0.4",
-    "lodash.isequal": "^4.5.0"
+    "lodash.isequal": "^4.5.0",
+    "object.entries": "^1.0.4"
   }
 }
