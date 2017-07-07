@@ -153,25 +153,6 @@ const vdomFilter = (pred, vdomMap, vdom) => {
   return Array.from(skip(1, vdomIter(vdomMap, vdom))).filter(pred);
 };
 
-class ContextRootWrapper extends Component {
-  constructor({ vdom, rerenderHook }) {
-    super({ vdom, rerenderHook });
-    this.state = {vdom};
-
-    // We are passed a callback that we use to give the RenderContext a function
-    // that will cause the vdom to get re-rendered
-
-    rerenderHook(vdom => {
-      this.setState({ vdom });
-      rerender();
-    });
-  }
-
-  render({}, {vdom}) {
-    return vdom;
-  }
-}
-
 class FindWrapper {
   constructor(context, _iter, selector) {
     // Set a non-enumerable property for context. In case a user does an deep
@@ -292,6 +273,23 @@ const setHiddenProp = (object, prop, value) => {
   return value;
 };
 
+class ContextRootWrapper extends Component {
+  constructor({ vdom, context }) {
+    super({ vdom, context });
+    this.state = {vdom};
+
+    // setup the re-renderer on the RenderContext
+    setHiddenProp(context, 'contextRender', vdom => {
+      this.setState({ vdom });
+      rerender();
+    });
+  }
+
+  render({}, {vdom}) {
+    return vdom;
+  }
+}
+
 class RenderContext extends FindWrapper {
   constructor({depth}) {
     super(null, []);
@@ -305,12 +303,12 @@ class RenderContext extends FindWrapper {
       setHiddenProp(this, prop, new Map());
     });
 
-    // Render an Empty ContextRootWrapper and get it's rerender method:
+    // Render an Empty ContextRootWrapper.  This sets up `this.contextRender`.
     render({
       nodeName: ContextRootWrapper,
       attributes: {
         vdom: null,
-        rerenderHook: contextRender => setHiddenProp(this, 'contextRender', contextRender),
+        context: this,
       },
     }, this.fragment);
 
