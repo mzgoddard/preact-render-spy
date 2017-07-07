@@ -305,26 +305,23 @@ class RenderContext extends FindWrapper {
       setHiddenProp(this, prop, new Map());
     });
 
+    // Render an Empty ContextRootWrapper and get it's rerender method:
+    render({
+      nodeName: ContextRootWrapper,
+      attributes: {
+        vdom: null,
+        rerenderHook: contextRender => setHiddenProp(this, 'contextRender', contextRender),
+      },
+    }, this.fragment);
+
   }
 
   render(vdom) {
-    const spiedDom = spyWalk(this, setVDom(this, 'root', vdom), 0);
     // Add what we need to be a FindWrapper:
     this[0] = vdom;
     this.length = 1;
+    this.contextRender(spyWalk(this, setVDom(this, 'root', vdom), 0));
 
-    // If we have a root component, have it update the state
-    if (this.contextRender) {
-      this.contextRender(spiedDom);
-    } else {
-      render({
-        nodeName: ContextRootWrapper,
-        attributes: {
-          vdom: spiedDom,
-          rerenderHook: contextRender => setHiddenProp(this, 'contextRender', contextRender),
-        },
-      }, this.fragment);
-    }
     return this;
   }
 }
