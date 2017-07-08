@@ -1,78 +1,80 @@
-import { h, Component, VNode } from 'preact';
-import { deep, render, shallow, FindWrapper, RenderContext } from '../';
+import { h, Component, VNode } from "preact";
+import defaultDeep, { deep, render, shallow, FindWrapper, RenderContext } from "../";
 
-interface ChildProps {
-  onClick?: () => void;
-  value?: string;
+interface CompAProps {
+    propA?: string;
 }
 
-interface ChildState {
-  value?: string;
+interface CompAState {
+    propA: string;
 }
 
-class Child extends Component<ChildProps, ChildState> {
-  constructor(props: ChildProps) {
-    super(props);
-    this.state = {value: props.value};
-  }
+class CompA extends Component<CompAProps, CompAState> {
+    state: CompAState = {
+        propA: this.props.propA || "default",
+    };
 
-  componentWillReceiveProps(newProps: ChildProps) {
-    this.setState({value: `_${newProps.value}_`});
-  }
-
-  render(props: ChildProps, {value}: ChildState) {
-    return (
-      <div>{value}</div>
-    );
-  }
-}
-interface ParentProps extends ChildProps {
-  onClick?: () => void;
+    render(props: CompAProps, { propA }: CompAState) {
+        return <div>{propA}</div>;
+    }
 }
 
-interface ParentState extends ChildState {}
-
-class Parent extends Component<ParentProps, ParentState> {
-  constructor(props: ChildProps) {
-    super(props);
-    this.state = {value: 'default'};
-  }
-
-  render(props: ParentProps, {value}: ParentState) {
-    return (
-      <Child
-        onClick={() => this.setState({value: 'clicked'})}
-        value={value}
-      />
-    );
-  }
+interface CompBProps {
+    propB?: number;
 }
 
-function useRenderContext(context: RenderContext<any, any>) {
-  context.render(<Parent />);
-  useFindWrapper(context);
+interface CompBState {
+    propB: number;
 }
 
-function useFindWrapper(context: FindWrapper<any, any>) {
-  const contextNode = context.length;
-  const containedNode = context[0];
-  const text1 = context.text();
-  const atWrapper: FindWrapper<any, any> = context.at(0);
-  const attrs: ParentProps = context.attrs();
-  const valueProp: string = context.attr<'value'>('value');
-  const matches = context.find('hi');
-  const matchesLength = matches.length;
-  const isContained = context.contains(containedNode);
-  context.simulate('click');
-  const filterWrapper: FindWrapper<any, any> = context.filter('hi');
-  const node: VNode = context.output();
+class CompB extends Component<CompBProps, CompBState> {
+    state: CompBState = {
+        propB: this.props.propB || 0,
+    };
+
+    render(props: CompBProps, { propB }: CompBState) {
+        return <div>{propB}</div>;
+    }
 }
 
-const shallowContext = shallow<ParentProps, ParentState>(<Parent />);
-useRenderContext(shallowContext);
+function exerciseFindWrapper<P, S, K extends keyof P>(context: FindWrapper<P, S>, attr: K) {
+    const contextNode = context.length;
 
-const deepContext = deep<ParentProps, ParentState>(<Parent />);
-useRenderContext(deepContext);
+    const containedNode = context[0];
+    const isContained = context.contains(containedNode);
 
-const renderContext = render<ParentProps, ParentState>(<Parent />);
-useRenderContext(renderContext);
+    const text1 = context.text();
+
+    const atWrapper: FindWrapper<any, any> = context.at(0);
+    const filterWrapper: FindWrapper<any, any> = context.filter("hi");
+    const findWrapper: FindWrapper<any, any> = context.find("hi");
+
+    const attrs: CompAProps = context.attrs();
+    const attrValue = context.attr(attr);
+
+    context.simulate("click");
+
+    const node: VNode = context.output();
+}
+
+// exercise shallow
+const shallowContextA = shallow<CompAProps, CompAState>(<CompA />);
+exerciseFindWrapper(shallowContextA, "propA");
+
+// RenderContext can be re-rendered
+const shallowContextB = shallowContextA.render<CompBProps, CompBProps>(<CompB />);
+exerciseFindWrapper(shallowContextB, "propB");
+
+// exercise deep without depth
+const deepContextA = deep<CompAProps, CompAState>(<CompA propA="test" />);
+exerciseFindWrapper(deepContextA, "propA");
+
+// exercise deep with depth
+const deepContextB = deep<CompAProps, CompAState>(<CompA propA="test" />, { depth: 10 });
+
+// exercise render (deep)
+const renderContext = render<CompAProps, CompAState>(<CompA />);
+exerciseFindWrapper(renderContext, "propA");
+
+// exercise default export (deep)
+const defaultDeepContextB = defaultDeep<CompAProps, CompAState>(<CompA propA="test" />, { depth: 10 });
