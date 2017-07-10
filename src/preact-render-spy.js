@@ -274,12 +274,15 @@ const setHiddenProp = (object, prop, value) => {
 };
 
 class ContextRootWrapper extends Component {
-  constructor({ vdom, context }) {
-    super({ vdom, context });
+  constructor(props) {
+    super(props);
+
+    const { vdom, renderRef } = props;
     this.state = {vdom};
 
-    // setup the re-renderer on the RenderContext
-    setHiddenProp(context, 'contextRender', vdom => {
+    // setup the re-renderer - call the `renderRef` callback with a
+    // function that will re-render the content here
+    renderRef(vdom => {
       this.setState({ vdom });
       rerender();
     });
@@ -308,7 +311,7 @@ class RenderContext extends FindWrapper {
       nodeName: ContextRootWrapper,
       attributes: {
         vdom: null,
-        context: this,
+        renderRef: contextRender => setHiddenProp(this, 'contextRender', contextRender),
       },
     }, this.fragment);
 
