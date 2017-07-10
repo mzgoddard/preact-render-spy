@@ -1,4 +1,4 @@
-const {render, rerender} = require('preact');
+const {render, rerender, Component} = require('preact');
 const isEqual = require('lodash.isequal');
 
 const {isWhere} = require('./is-where');
@@ -264,58 +264,65 @@ class FindWrapper {
   }
 }
 
+const setHiddenProp = (object, prop, value) => {
+  Object.defineProperty(object, prop, {
+    enumerable: false,
+    configurable: true,
+    value,
+  });
+  return value;
+};
+
+class ContextRootWrapper extends Component {
+  constructor(props) {
+    super(props);
+
+    const { vdom, renderRef } = props;
+    this.state = {vdom};
+
+    // setup the re-renderer - call the `renderRef` callback with a
+    // function that will re-render the content here
+    renderRef(vdom => {
+      this.setState({ vdom });
+      rerender();
+    });
+  }
+
+  render({}, {vdom}) {
+    return vdom;
+  }
+}
+
 class RenderContext extends FindWrapper {
   constructor({depth}) {
     super(null, []);
 
-    Object.defineProperties(this, {
-      context: {
-        value: this,
-        configurable: true,
-        enumerable: false,
-      },
-      renderedDepth: {
-        value: (depth || Infinity) - 1,
-        enumerable: false,
-      },
-      keyMap: {
-        value: new Map(),
-        enumerable: false,
-      },
-      depthMap: {
-        value: new Map(),
-        enumerable: false,
-      },
-      componentMap: {
-        value: new Map(),
-        enumerable: false,
-      },
-      componentNoopMap: {
-        value: new Map(),
-        enumerable: false,
-      },
-      vdomMap: {
-        value: new Map(),
-        enumerable: false,
-      },
-      fragment: {
-        value: document.createDocumentFragment(),
-        enumerable: false,
-      },
+    setHiddenProp(this, 'context', this);
+    setHiddenProp(this, 'renderedDepth', (depth || Infinity) - 1);
+    setHiddenProp(this, 'fragment', document.createDocumentFragment());
+
+    // Create our Maps
+    ['keyMap', 'depthMap', 'componentMap', 'componentNoopMap', 'vdomMap'].forEach(prop => {
+      setHiddenProp(this, prop, new Map());
     });
+
+    // Render an Empty ContextRootWrapper.  This sets up `this.contextRender`.
+    render({
+      nodeName: ContextRootWrapper,
+      attributes: {
+        vdom: null,
+        renderRef: contextRender => setHiddenProp(this, 'contextRender', contextRender),
+      },
+    }, this.fragment);
+
   }
 
   render(vdom) {
+    // Add what we need to be a FindWrapper:
     this[0] = vdom;
     this.length = 1;
-    Object.defineProperty(this, 'component', {
-      enumerable: false,
-      configurable: true,
-      value: render(
-        spyWalk(this, setVDom(this, 'root', vdom), 0),
-        this.fragment
-      ),
-    });
+    this.contextRender(spyWalk(this, setVDom(this, 'root', vdom), 0));
+
     return this;
   }
 }
