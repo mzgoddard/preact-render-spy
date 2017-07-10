@@ -120,7 +120,20 @@ Returns the flattened string of any text children of any child component.
 Looks for an attribute properly named `onEvent` or `onEventCapture` and calls it, passing the arguments.
 
 ### `FindWrapper#output()`
-Requires a single Component or functional node. Returns the raw vdom output of the given component.
+Requires a single Component or functional node. Returns the vdom output of the given component.
+Any Component or functional nodes will be "recursive" up to the depth you specified.  I.E.:
+
+Example:
+```jsx
+
+const Second = ({ children }) => <div>second {children}</div>;
+const First = () => <Second>first</Second>;
+
+// rendered deep, we get the div output
+expect(deep(<First />).output()).toEqual(<div>second first</div>);
+// rendered shallow, we get the <Second> jsx node back
+expect(shallow(<First />).output()).toEqual(<Second>first</Second>);
+```
 
 ### `FindWrapper#filter(selector)`
 Returns a new `FindWrapper` with a subset of the previously selected elements given the selector argument.
