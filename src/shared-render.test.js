@@ -2,62 +2,66 @@ const {h, Component} = require('preact');
 
 const {deep, shallow} = require('./preact-render-spy');
 
+class ReceivesProps extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {value: props.value};
+  }
+
+  componentWillReceiveProps(newProps) {
+    this.setState({value: `_${newProps.value}_`});
+  }
+
+  render(props, {value}) {
+    return (
+      <div>{value}</div>
+    );
+  }
+}
+
+class Div extends Component {
+  render() {
+    return <div />;
+  }
+}
+
+class DivChildren extends Component {
+  render({children}) {
+    return <div>{children}</div>;
+  }
+}
+
+class ClickCount extends Component {
+  constructor(...args) {
+    super(...args);
+
+    this.state = {count: 0};
+    this.onClick = this.onClick.bind(this);
+  }
+
+  onClick() {
+    this.setState({count: this.state.count + 1});
+  }
+
+  render({}, {count}) {
+    return <div onClick={this.onClick}>{count}</div>;
+  }
+}
+
+class DivCount extends Component {
+  render({count}) {
+    return <div>{count}</div>;
+  }
+}
+
+const DivCountStateless = ({count}) => <div>{count}</div>;
+
+const NullStateless = () => null;
+
+const Second = ({ children }) => <div>second {children}</div>;
+const First = () => <Second>first</Second>;
+
 const sharedTests = (name, func) => {
-  class ReceivesProps extends Component {
-    constructor(props) {
-      super(props);
-      this.state = {value: props.value};
-    }
-
-    componentWillReceiveProps(newProps) {
-      this.setState({value: `_${newProps.value}_`});
-    }
-
-    render(props, {value}) {
-      return (
-        <div>{value}</div>
-      );
-    }
-  }
-
-  class Div extends Component {
-    render() {
-      return <div />;
-    }
-  }
-
-  class DivChildren extends Component {
-    render({children}) {
-      return <div>{children}</div>;
-    }
-  }
-
-  class ClickCount extends Component {
-    constructor(...args) {
-      super(...args);
-
-      this.state = {count: 0};
-      this.onClick = this.onClick.bind(this);
-    }
-
-    onClick() {
-      this.setState({count: this.state.count + 1});
-    }
-
-    render({}, {count}) {
-      return <div onClick={this.onClick}>{count}</div>;
-    }
-  }
-
-  class DivCount extends Component {
-    render({count}) {
-      return <div>{count}</div>;
-    }
-  }
-
-  const DivCountStateless = ({count}) => <div>{count}</div>;
-
-  const NullStateless = () => null;
 
   it(`${name}: renders into fragment`, () => {
     const context = func(<Div />);
@@ -177,7 +181,18 @@ const sharedTests = (name, func) => {
     context.render(<ReceivesProps value="received" />);
     expect(context.text()).toBe('_received_');
   });
+
+  it(`${name}: output matches snapshot`, () => {
+    const context = func(<First />);
+    expect(context.output()).toMatchSnapshot();
+  });
 };
 
 sharedTests('deep', deep);
 sharedTests('shallow', shallow);
+
+
+it('output() is the same depth as the render method', () => {
+  expect(deep(<First />).output()).toEqual(<div>second first</div>);
+  expect(shallow(<First />).output()).toEqual(<Second>first</Second>);
+});

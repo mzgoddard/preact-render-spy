@@ -1,4 +1,4 @@
-const {render, rerender, Component} = require('preact');
+const {render, rerender, h, Component} = require('preact');
 const isEqual = require('lodash.isequal');
 
 const {isWhere} = require('./is-where');
@@ -260,7 +260,25 @@ class FindWrapper {
       throw new Error('preact-render-spy: Must have a result of a preact class or function component for .output()');
     }
 
-    return this.context.vdomMap.get(this[0]);
+    const getOutput = node => {
+      if (!node || typeof node !== 'object') {
+        return node;
+      }
+      // recursively resolve the node
+      let nodeOutput = node;
+      while (this.vdomMap.has(nodeOutput)) {
+        nodeOutput = this.vdomMap.get(nodeOutput);
+      }
+      const clone = h(
+        nodeOutput.nodeName,
+        nodeOutput.attributes,
+        nodeOutput.children && nodeOutput.children.map(getOutput)
+      );
+
+      return clone;
+    };
+
+    return getOutput(this[0]);
   }
 }
 
