@@ -10,7 +10,7 @@
   "scripts": {
     "test-jest": "jest --config jest.config.json",
     "test-jest-webpack": "jest-webpack",
-    "test": "npm run test-jest && npm run test-jest-webpack",
+    "test": "npm run test-jest",
     "pretest": "npm run lint",
     "lint": "eslint --ignore-pattern='!.eslintrc.js' --ext js,jsx src .eslintrc.js *.js"
   },
