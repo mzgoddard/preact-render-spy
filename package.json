@@ -15,7 +15,8 @@
     "lint": "eslint --ignore-pattern='!.eslintrc.js' --ext js,jsx src .eslintrc.js *.js"
   },
   "jest": {
-    "transform": {}
+    "transform": {},
+    "snapshotSerializers": [ "./snapshot" ]
   },
   "keywords": [
     "preact",
@@ -58,6 +59,7 @@
   },
   "dependencies": {
     "lodash.isequal": "^4.5.0",
-    "object.entries": "^1.0.4"
+    "object.entries": "^1.0.4",
+    "preact-render-to-string": "^3.6.3"
   }
 }

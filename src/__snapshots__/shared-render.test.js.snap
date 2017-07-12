@@ -1,23 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`deep: output matches snapshot 1`] = `
-VNode {
-  "attributes": undefined,
-  "children": Array [
-    "second first",
-  ],
-  "key": undefined,
-  "nodeName": "div",
-}
-`;
+exports[`deep: output matches snapshot 1`] = `<div>second first</div>`;
 
-exports[`shallow: output matches snapshot 1`] = `
-VNode {
-  "attributes": undefined,
-  "children": Array [
-    "first",
-  ],
-  "key": undefined,
-  "nodeName": [Function],
-}
-`;
+exports[`shallow: output matches snapshot 1`] = `<Second>first</Second>`;
