@@ -16,7 +16,9 @@
   },
   "jest": {
     "transform": {},
-    "snapshotSerializers": [ "./snapshot" ]
+    "snapshotSerializers": [
+      "./snapshot"
+    ]
   },
   "keywords": [
     "preact",
@@ -47,12 +49,12 @@
     "babel-loader": "^7.0.0",
     "babel-preset-jest": "^20.0.3",
     "babel-preset-preact": "^1.1.0",
-    "eslint": "^4.1.1",
+    "eslint": "^4.2.0",
     "eslint-plugin-jest": "^20.0.3",
     "eslint-plugin-react": "^7.1.0",
     "jest": "^20.0.4",
-    "preact": "^8.1.0",
-    "webpack": "^2.6.1"
+    "preact": "^8.2.1",
+    "webpack": "^2.7.0"
   },
   "peerDependencies": {
     "preact": "^8.1.0"
