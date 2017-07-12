@@ -292,7 +292,8 @@ class FindWrapper {
 
     return `preact-render-spy (${this.length} nodes)
 -------
-${Array.from(this).map(render).join('\n')}`;
+${Array.from(this).map(render).join('\n')}
+`;
   }
 }
 

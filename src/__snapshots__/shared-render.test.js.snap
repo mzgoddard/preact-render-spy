@@ -4,6 +4,7 @@ exports[`deep: context matches snapshot 1`] = `
 preact-render-spy (1 nodes)
 -------
 <div>second first</div>
+
 `;
 
 exports[`deep: find matches snapshot 1`] = `
@@ -12,6 +13,7 @@ preact-render-spy (3 nodes)
 <span>1</span>
 <span>2</span>
 <span>3</span>
+
 `;
 
 exports[`deep: output matches snapshot 1`] = `<div>second first</div>`;
@@ -20,6 +22,7 @@ exports[`shallow: context matches snapshot 1`] = `
 preact-render-spy (1 nodes)
 -------
 <Second>first</Second>
+
 `;
 
 exports[`shallow: find matches snapshot 1`] = `
@@ -28,6 +31,7 @@ preact-render-spy (3 nodes)
 <span>1</span>
 <span>2</span>
 <span>3</span>
+
 `;
 
 exports[`shallow: output matches snapshot 1`] = `<Second>first</Second>`;
