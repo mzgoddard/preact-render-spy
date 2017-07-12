@@ -1,5 +1,7 @@
 const renderToString = require('preact-render-to-string/jsx');
-const FindWrapper = require('./src/preact-render-spy').FindWrapper;
+const renderSpy = require('./src/preact-render-spy');
+const FindWrapper = renderSpy.FindWrapper;
+const config = renderSpy.config;
 
 module.exports = {
   test(object) {
@@ -12,6 +14,6 @@ module.exports = {
     if (val instanceof FindWrapper) {
       return val.toString();
     }
-    return renderToString(val, {}, {shallow: true}, true);
+    return renderToString(val, {}, config.toStringOptions, true);
   },
 };

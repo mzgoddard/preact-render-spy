@@ -7,6 +7,7 @@ const {selToWhere} = require('./sel-to-where');
 
 const config = {
   SPY_PRIVATE_KEY: 'SPY_PRIVATE_KEY',
+  toStringOptions: {shallow: true, skipFalseAttributes: false},
 };
 
 const spyWalk = (context, vdom, depth) => {
@@ -287,7 +288,7 @@ class FindWrapper {
       if (typeof jsx.nodeName === 'function') {
         jsx = this.at(index).output();
       }
-      return renderToString(jsx, {}, {shallow: true}, true);
+      return renderToString(jsx, {}, config.toStringOptions, true);
     };
 
     return `preact-render-spy (${this.length} nodes)

@@ -12,7 +12,12 @@ preact-render-spy (3 nodes)
 -------
 <span onClick={[Function onClick]}>click</span>
 <span attr="text attr">text</span>
-<span itsTrue={true}>bools</span>
+<span
+  itsTrue={true}
+  itsFalse={false}
+>
+  bools
+</span>
 
 `;
 
@@ -30,7 +35,12 @@ preact-render-spy (3 nodes)
 -------
 <span onClick={[Function onClick]}>click</span>
 <span attr="text attr">text</span>
-<span itsTrue={true}>bools</span>
+<span
+  itsTrue={true}
+  itsFalse={false}
+>
+  bools
+</span>
 
 `;
 
