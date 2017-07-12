@@ -287,7 +287,7 @@ class FindWrapper {
       if (typeof jsx.nodeName === 'function') {
         jsx = this.at(index).output();
       }
-      return renderToString(jsx, {}, {shallow: true, functions: true, functionNames: true}, true);
+      return renderToString(jsx, {}, {shallow: true}, true);
     };
 
     return `preact-render-spy (${this.length} nodes)
