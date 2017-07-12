@@ -10,9 +10,9 @@ preact-render-spy (1 nodes)
 exports[`deep: find matches snapshot 1`] = `
 preact-render-spy (3 nodes)
 -------
-<span>1</span>
-<span>2</span>
-<span>3</span>
+<span onClick={[Function onClick]}>click</span>
+<span attr="text attr">text</span>
+<span itsTrue={true}>bools</span>
 
 `;
 
@@ -28,9 +28,9 @@ preact-render-spy (1 nodes)
 exports[`shallow: find matches snapshot 1`] = `
 preact-render-spy (3 nodes)
 -------
-<span>1</span>
-<span>2</span>
-<span>3</span>
+<span onClick={[Function onClick]}>click</span>
+<span attr="text attr">text</span>
+<span itsTrue={true}>bools</span>
 
 `;
 

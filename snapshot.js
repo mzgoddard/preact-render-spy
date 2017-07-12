@@ -1,4 +1,4 @@
-const renderToString = require('preact-render-to-string');
+const renderToString = require('preact-render-to-string/jsx');
 const FindWrapper = require('./src/preact-render-spy').FindWrapper;
 
 module.exports = {

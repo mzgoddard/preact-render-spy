@@ -193,7 +193,13 @@ const sharedTests = (name, func) => {
   });
 
   it(`${name}: find matches snapshot`, () => {
-    const context = func(<div><span>1</span><span>2</span><span>3</span></div>);
+    const onClick = () => {};
+
+    const context = func(<div>
+      <span onClick={onClick}>click</span>
+      <span attr="text attr">text</span>
+      <span itsTrue={true} itsFalse={false}>bools</span>
+    </div>);
     expect(context.find('span')).toMatchSnapshot();
   });
 };

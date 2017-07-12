@@ -1,6 +1,6 @@
 const {render, rerender, h, Component} = require('preact');
 const isEqual = require('lodash.isequal');
-const renderToString = require('preact-render-to-string');
+const renderToString = require('preact-render-to-string/jsx');
 
 const {isWhere} = require('./is-where');
 const {selToWhere} = require('./sel-to-where');
@@ -287,7 +287,7 @@ class FindWrapper {
       if (typeof jsx.nodeName === 'function') {
         jsx = this.at(index).output();
       }
-      return renderToString(jsx, {}, {shallow: true}, true);
+      return renderToString(jsx, {}, {shallow: true, functions: true, functionNames: true}, true);
     };
 
     return `preact-render-spy (${this.length} nodes)
