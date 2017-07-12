@@ -5,10 +5,21 @@ const config = renderSpy.config;
 
 module.exports = {
   test(object) {
-    const isObject = object && typeof object==='object';
-    const isVNode = isObject && 'nodeName' in object && 'attributes' in object && 'children' in object && !('nodeType' in object);
-    const isFindWrapper = isObject && object instanceof FindWrapper;
-    return isVNode || isFindWrapper;
+    if (!object || typeof object !== 'object') {
+      return false;
+    }
+
+    if (object instanceof FindWrapper) {
+      // is FindWrapper!
+      return true;
+    }
+
+    if ('nodeName' in object && 'attributes' in object && 'children' in object && !('nodeType' in object)) {
+      // is VNode!
+      return true;
+    }
+
+    return false;
   },
   print(val) {
     if (val instanceof FindWrapper) {
