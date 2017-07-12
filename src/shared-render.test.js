@@ -186,6 +186,16 @@ const sharedTests = (name, func) => {
     const context = func(<First />);
     expect(context.output()).toMatchSnapshot();
   });
+
+  it(`${name}: context matches snapshot`, () => {
+    const context = func(<First />);
+    expect(context).toMatchSnapshot();
+  });
+
+  it(`${name}: find matches snapshot`, () => {
+    const context = func(<div><span>1</span><span>2</span><span>3</span></div>);
+    expect(context.find('span')).toMatchSnapshot();
+  });
 };
 
 sharedTests('deep', deep);
