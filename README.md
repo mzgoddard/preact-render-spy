@@ -38,8 +38,8 @@ is set to `Infinity`, and we provide another renderer called `shallow` to render
 `{ depth: 1 }`.
 
 ## Jest Snapshot support
-We provide a plugin for rendering your jsx snapshots to XML that you can enable using the jest
-configuration:
+We provide a plugin for rendering your jsx snapshots to a formatted string that you can enable
+using the jest configuration:
 
 ```json
 {
