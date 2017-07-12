@@ -37,6 +37,16 @@ a certain number of levels deep in the component tree.  The `depth` of the defau
 is set to `Infinity`, and we provide another renderer called `shallow` to render with
 `{ depth: 1 }`.
 
+## Jest Snapshot support
+We provide a plugin for rendering your jsx snapshots to XML that you can enable using the jest
+configuration:
+
+```json
+{
+  "snapshotSerializers": [ "preact-render-spy/snapshot" ]
+}
+```
+
 ## Exported Methods
 
 ### `deep(jsx, {depth = Infinity} = {})`
