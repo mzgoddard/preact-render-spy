@@ -15,7 +15,10 @@
     "lint": "eslint --ignore-pattern='!.eslintrc.js' --ext js,jsx src .eslintrc.js *.js"
   },
   "jest": {
-    "transform": {}
+    "transform": {},
+    "snapshotSerializers": [
+      "./snapshot"
+    ]
   },
   "keywords": [
     "preact",
@@ -46,18 +49,19 @@
     "babel-loader": "^7.0.0",
     "babel-preset-jest": "^20.0.3",
     "babel-preset-preact": "^1.1.0",
-    "eslint": "^4.1.1",
+    "eslint": "^4.2.0",
     "eslint-plugin-jest": "^20.0.3",
     "eslint-plugin-react": "^7.1.0",
     "jest": "^20.0.4",
-    "preact": "^8.1.0",
-    "webpack": "^2.6.1"
+    "preact": "^8.2.1",
+    "webpack": "^2.7.0"
   },
   "peerDependencies": {
     "preact": "^8.1.0"
   },
   "dependencies": {
     "lodash.isequal": "^4.5.0",
-    "object.entries": "^1.0.4"
+    "object.entries": "^1.0.4",
+    "preact-render-to-string": "^3.6.3"
   }
 }

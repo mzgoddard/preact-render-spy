@@ -1,11 +1,13 @@
 const {render, rerender, h, Component} = require('preact');
 const isEqual = require('lodash.isequal');
+const renderToString = require('preact-render-to-string/jsx');
 
 const {isWhere} = require('./is-where');
 const {selToWhere} = require('./sel-to-where');
 
 const config = {
   SPY_PRIVATE_KEY: 'SPY_PRIVATE_KEY',
+  toStringOptions: {shallow: true, skipFalseAttributes: false},
 };
 
 const spyWalk = (context, vdom, depth) => {
@@ -266,8 +268,8 @@ class FindWrapper {
       }
       // recursively resolve the node
       let nodeOutput = node;
-      while (this.vdomMap.has(nodeOutput)) {
-        nodeOutput = this.vdomMap.get(nodeOutput);
+      while (this.context.vdomMap.has(nodeOutput)) {
+        nodeOutput = this.context.vdomMap.get(nodeOutput);
       }
       const clone = h(
         nodeOutput.nodeName,
@@ -279,6 +281,20 @@ class FindWrapper {
     };
 
     return getOutput(this[0]);
+  }
+
+  toString() {
+    const render = (jsx, index) => {
+      if (typeof jsx.nodeName === 'function') {
+        jsx = this.at(index).output();
+      }
+      return renderToString(jsx, {}, config.toStringOptions, true);
+    };
+
+    return `preact-render-spy (${this.length} nodes)
+-------
+${Array.from(this).map(render).join('\n')}
+`;
   }
 }
 
@@ -355,3 +371,5 @@ exports.deep = deep;
 exports.default = deep;
 exports.render = deep;
 exports.shallow = shallow;
+exports.RenderContext = RenderContext;
+exports.FindWrapper = FindWrapper;

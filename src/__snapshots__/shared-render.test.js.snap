@@ -1,23 +1,47 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`deep: output matches snapshot 1`] = `
-VNode {
-  "attributes": undefined,
-  "children": Array [
-    "second first",
-  ],
-  "key": undefined,
-  "nodeName": "div",
-}
+exports[`deep: context matches snapshot 1`] = `
+preact-render-spy (1 nodes)
+-------
+<div>second first</div>
+
 `;
 
-exports[`shallow: output matches snapshot 1`] = `
-VNode {
-  "attributes": undefined,
-  "children": Array [
-    "first",
-  ],
-  "key": undefined,
-  "nodeName": [Function],
-}
+exports[`deep: find matches snapshot 1`] = `
+preact-render-spy (3 nodes)
+-------
+<span onClick={[Function onClick]}>click</span>
+<span attr="text attr">text</span>
+<span
+  itsTrue={true}
+  itsFalse={false}
+>
+  bools
+</span>
+
 `;
+
+exports[`deep: output matches snapshot 1`] = `<div>second first</div>`;
+
+exports[`shallow: context matches snapshot 1`] = `
+preact-render-spy (1 nodes)
+-------
+<Second>first</Second>
+
+`;
+
+exports[`shallow: find matches snapshot 1`] = `
+preact-render-spy (3 nodes)
+-------
+<span onClick={[Function onClick]}>click</span>
+<span attr="text attr">text</span>
+<span
+  itsTrue={true}
+  itsFalse={false}
+>
+  bools
+</span>
+
+`;
+
+exports[`shallow: output matches snapshot 1`] = `<Second>first</Second>`;

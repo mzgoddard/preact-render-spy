@@ -5,5 +5,8 @@
   ],
   "transform": {
     "^.+\\.test\\.jsx?$": "babel-jest"
-  }
+  },
+  "snapshotSerializers": [
+    "./snapshot"
+  ]
 }
