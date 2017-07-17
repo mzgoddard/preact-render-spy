@@ -207,6 +207,13 @@ const sharedTests = (name, func) => {
     </div>);
     expect(context.find('span')).toMatchSnapshot();
   });
+
+  it(`${name}: weird render cases toString matches snapshot`, () => {
+    const Test = () => <NullStateless><Div /></NullStateless>;
+    const context = func(<Test />);
+    expect(context.toString()).toMatchSnapshot();
+    expect(context.find('Div')).toMatchSnapshot();
+  });
 };
 
 sharedTests('deep', deep);

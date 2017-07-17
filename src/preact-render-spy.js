@@ -128,7 +128,7 @@ const vdomIter = function* (vdomMap, vdom) {
     return;
   }
   yield vdom;
-  if (typeof vdom.nodeName === 'function') {
+  if (typeof vdom.nodeName === 'function' && vdomMap.has(vdom)) {
     yield* vdomIter(vdomMap, vdomMap.get(vdom));
   }
   else {
@@ -292,6 +292,7 @@ class FindWrapper {
       if (typeof jsx.nodeName === 'function') {
         jsx = this.at(index).output();
       }
+      if (!jsx) return `{${JSON.stringify(jsx)}}`;
       return renderToString(jsx, {}, config.toStringOptions, true);
     };
 
