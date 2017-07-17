@@ -296,7 +296,11 @@ class FindWrapper {
       return renderToString(jsx, {}, config.toStringOptions, true);
     };
 
-    return `preact-render-spy (${this.length} nodes)
+    const header = `preact-render-spy (${this.length} nodes)`;
+    if (!this.length) {
+      return header;
+    }
+    return `${header}
 -------
 ${Array.from(this).map(render).join('\n')}
 `;

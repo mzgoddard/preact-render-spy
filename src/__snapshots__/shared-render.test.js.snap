@@ -30,12 +30,7 @@ exports[`deep: weird render cases toString matches snapshot 1`] = `
 "
 `;
 
-exports[`deep: weird render cases toString matches snapshot 2`] = `
-preact-render-spy (0 nodes)
--------
-
-
-`;
+exports[`deep: weird render cases toString matches snapshot 2`] = `preact-render-spy (0 nodes)`;
 
 exports[`shallow: context matches snapshot 1`] = `
 preact-render-spy (1 nodes)
