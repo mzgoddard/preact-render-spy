@@ -23,6 +23,15 @@ preact-render-spy (3 nodes)
 
 exports[`deep: output matches snapshot 1`] = `<div>second first</div>`;
 
+exports[`deep: weird render cases toString matches snapshot 1`] = `
+"preact-render-spy (1 nodes)
+-------
+{null}
+"
+`;
+
+exports[`deep: weird render cases toString matches snapshot 2`] = `preact-render-spy (0 nodes)`;
+
 exports[`shallow: context matches snapshot 1`] = `
 preact-render-spy (1 nodes)
 -------
@@ -45,3 +54,19 @@ preact-render-spy (3 nodes)
 `;
 
 exports[`shallow: output matches snapshot 1`] = `<Second>first</Second>`;
+
+exports[`shallow: weird render cases toString matches snapshot 1`] = `
+"preact-render-spy (1 nodes)
+-------
+<NullStateless>
+  <Div></Div>
+</NullStateless>
+"
+`;
+
+exports[`shallow: weird render cases toString matches snapshot 2`] = `
+preact-render-spy (1 nodes)
+-------
+<Div></Div>
+
+`;

@@ -128,7 +128,7 @@ const vdomIter = function* (vdomMap, vdom) {
     return;
   }
   yield vdom;
-  if (typeof vdom.nodeName === 'function') {
+  if (typeof vdom.nodeName === 'function' && vdomMap.has(vdom)) {
     yield* vdomIter(vdomMap, vdomMap.get(vdom));
   }
   else {
@@ -258,7 +258,7 @@ class FindWrapper {
       throw new Error('preact-render-spy: Must have only 1 result for .output().');
     }
 
-    if (typeof this[0].nodeName !== 'function') {
+    if (!this[0] || typeof this[0].nodeName !== 'function') {
       throw new Error('preact-render-spy: Must have a result of a preact class or function component for .output()');
     }
 
@@ -270,6 +270,10 @@ class FindWrapper {
       let nodeOutput = node;
       while (this.context.vdomMap.has(nodeOutput)) {
         nodeOutput = this.context.vdomMap.get(nodeOutput);
+      }
+      // in case the node output null or false...
+      if (!nodeOutput) {
+        return nodeOutput;
       }
       const clone = h(
         nodeOutput.nodeName,
@@ -288,10 +292,15 @@ class FindWrapper {
       if (typeof jsx.nodeName === 'function') {
         jsx = this.at(index).output();
       }
+      if (!jsx) return `{${JSON.stringify(jsx)}}`;
       return renderToString(jsx, {}, config.toStringOptions, true);
     };
 
-    return `preact-render-spy (${this.length} nodes)
+    const header = `preact-render-spy (${this.length} nodes)`;
+    if (!this.length) {
+      return header;
+    }
+    return `${header}
 -------
 ${Array.from(this).map(render).join('\n')}
 `;

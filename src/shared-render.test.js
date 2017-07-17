@@ -157,6 +157,11 @@ const sharedTests = (name, func) => {
     expect(context.output()).toEqual(<div><span /></div>);
   });
 
+  it(`${name}: output returns null output by a Component`, () => {
+    const context = func(<NullStateless/>);
+    expect(context.output()).toEqual(null);
+  });
+
   it(`${name}: simulate an event`, () => {
     let count = 0;
     let context = func(<div onClick={() => {count++;}}/>);
@@ -201,6 +206,13 @@ const sharedTests = (name, func) => {
       <span itsTrue={true} itsFalse={false}>bools</span>
     </div>);
     expect(context.find('span')).toMatchSnapshot();
+  });
+
+  it(`${name}: weird render cases toString matches snapshot`, () => {
+    const Test = () => <NullStateless><Div /></NullStateless>;
+    const context = func(<Test />);
+    expect(context.toString()).toMatchSnapshot();
+    expect(context.find('Div')).toMatchSnapshot();
   });
 };
 
