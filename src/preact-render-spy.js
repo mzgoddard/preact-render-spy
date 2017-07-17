@@ -258,7 +258,7 @@ class FindWrapper {
       throw new Error('preact-render-spy: Must have only 1 result for .output().');
     }
 
-    if (typeof this[0].nodeName !== 'function') {
+    if (!this[0] || typeof this[0].nodeName !== 'function') {
       throw new Error('preact-render-spy: Must have a result of a preact class or function component for .output()');
     }
 
@@ -270,6 +270,10 @@ class FindWrapper {
       let nodeOutput = node;
       while (this.context.vdomMap.has(nodeOutput)) {
         nodeOutput = this.context.vdomMap.get(nodeOutput);
+      }
+      // in case the node output null or false...
+      if (!nodeOutput) {
+        return nodeOutput;
       }
       const clone = h(
         nodeOutput.nodeName,
