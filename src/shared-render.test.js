@@ -54,6 +54,8 @@ class DivCount extends Component {
   }
 }
 
+const Text = () => 'Text';
+
 const DivCountStateless = ({count}) => <div>{count}</div>;
 
 const NullStateless = () => null;
@@ -213,6 +215,13 @@ const sharedTests = (name, func) => {
     const context = func(<Test />);
     expect(context.toString()).toMatchSnapshot();
     expect(context.find('Div')).toMatchSnapshot();
+  });
+
+  it(`${name}: snapshots for text nodes`, () => {
+    expect(func(<Text />)).toMatchSnapshot();
+
+    const Deeper = () => <div><Text /></div>;
+    expect(func(<Deeper />)).toMatchSnapshot();
   });
 };
 
