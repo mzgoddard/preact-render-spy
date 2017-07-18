@@ -7,6 +7,7 @@ const {selToWhere} = require('./sel-to-where');
 
 const config = {
   SPY_PRIVATE_KEY: 'SPY_PRIVATE_KEY',
+  createFragment: () => document.createDocumentFragment(),
   toStringOptions: {shallow: true, skipFalseAttributes: false},
 };
 
@@ -342,7 +343,7 @@ class RenderContext extends FindWrapper {
 
     setHiddenProp(this, 'context', this);
     setHiddenProp(this, 'renderedDepth', (depth || Infinity) - 1);
-    setHiddenProp(this, 'fragment', document.createDocumentFragment());
+    setHiddenProp(this, 'fragment', config.createFragment());
 
     // Create our Maps
     ['keyMap', 'depthMap', 'componentMap', 'componentNoopMap', 'vdomMap'].forEach(prop => {
