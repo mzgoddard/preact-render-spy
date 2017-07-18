@@ -7,6 +7,7 @@
     "url": "https://github.com/mzgoddard/preact-render-spy"
   },
   "main": "index.js",
+  "typings": "index.d.ts",
   "scripts": {
     "test-jest": "jest --config jest.config.json",
     "test-jest-webpack": "jest-webpack",
@@ -54,6 +55,7 @@
     "eslint-plugin-react": "^7.1.0",
     "jest": "^20.0.4",
     "preact": "^8.2.1",
+    "typescript": "^2.4.1",
     "webpack": "^2.7.0"
   },
   "peerDependencies": {

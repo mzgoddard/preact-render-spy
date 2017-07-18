@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es5",
+    "jsx": "react",
+    "jsxFactory": "h",
+    "strict": true
+  },
+  "exclude": [
+    "node_modules",
+    "src"
+  ],
+  "types": [
+    "typePatches"
+  ]
+}
