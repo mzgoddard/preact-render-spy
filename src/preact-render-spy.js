@@ -272,7 +272,7 @@ class FindWrapper {
         nodeOutput = this.context.vdomMap.get(nodeOutput);
       }
       // in case the node output null or false...
-      if (!nodeOutput) {
+      if (!nodeOutput || typeof nodeOutput !== 'object') {
         return nodeOutput;
       }
       const clone = h(

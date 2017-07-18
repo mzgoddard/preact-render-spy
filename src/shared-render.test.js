@@ -219,6 +219,9 @@ const sharedTests = (name, func) => {
 
   it(`${name}: snapshots for text nodes`, () => {
     expect(func(<Text />)).toMatchSnapshot();
+
+    const Deeper = () => <div><Text /></div>;
+    expect(func(<Deeper />)).toMatchSnapshot();
   });
 };
 
