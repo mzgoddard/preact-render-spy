@@ -47,6 +47,27 @@ using the jest configuration:
 }
 ```
 
+## Configuration
+We export a `config` object which you can use to change some of the internal options.
+The values shown in this section are the defaults:
+
+```js
+import {config} from 'preact-render-spy';
+
+// This property is used by the spy renderer to pass information to the spies about where
+// they are in the vdom tree, it is generally removed from the properties passed down to your
+// component, but it might show up in some cases, and we want you to be able to pick it.
+config.SPY_PRIVATE_KEY = 'SPY_PRIVATE_KEY';
+
+// These options are passed to preact-render-to-string/jsx whenever you snapshot a VNode or
+// FindWrapper (and on the FindWrapper's toString method)
+config.toStringOptions = { shallow: true, skipFalseAttributes: false };
+
+// This option allows you to use a custom DOM implementation instead of relying on a global
+// document.createDocumentFragment()
+config.createFragment = () => document.createDocumentFragment();
+```
+
 ## Exported Methods
 
 ### `deep(jsx, {depth = Infinity} = {})`
