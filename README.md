@@ -37,6 +37,16 @@ a certain number of levels deep in the component tree.  The `depth` of the defau
 is set to `Infinity`, and we provide another renderer called `shallow` to render with
 `{ depth: 1 }`.
 
+## Jest Snapshot support
+We provide a plugin for rendering your jsx snapshots to a formatted string that you can enable
+using the jest configuration:
+
+```json
+{
+  "snapshotSerializers": [ "preact-render-spy/snapshot" ]
+}
+```
+
 ## Exported Methods
 
 ### `deep(jsx, {depth = Infinity} = {})`
@@ -80,8 +90,8 @@ This will return you a [`FindWrapper`](#findwrapper) which has other useful meth
 Like [`#find(selector)`](#rendercontextfindselector) `RenderContext` has the rest of `FindWrapper`'s methods.
 
 ### `RenderContext#render(jsx)`
-Re-renders the root level jsx node using the same depth initially requested.  **NOTE:** When preact re-renders this way,
-it will not reuse components, so if you want to test `componentWillReceiveProps` you will need to use a test wrapper component.
+Re-renders the root level jsx node using the same depth initially requested.  This can be useful for testing
+`componentWillReceiveProps` hooks.
 
 Example:
 
@@ -120,7 +130,20 @@ Returns the flattened string of any text children of any child component.
 Looks for an attribute properly named `onEvent` or `onEventCapture` and calls it, passing the arguments.
 
 ### `FindWrapper#output()`
-Requires a single Component or functional node. Returns the raw vdom output of the given component.
+Requires a single Component or functional node. Returns the vdom output of the given component.
+Any Component or functional nodes will be "recursive" up to the depth you specified.  I.E.:
+
+Example:
+```jsx
+
+const Second = ({ children }) => <div>second {children}</div>;
+const First = () => <Second>first</Second>;
+
+// rendered deep, we get the div output
+expect(deep(<First />).output()).toEqual(<div>second first</div>);
+// rendered shallow, we get the <Second> jsx node back
+expect(shallow(<First />).output()).toEqual(<Second>first</Second>);
+```
 
 ### `FindWrapper#filter(selector)`
 Returns a new `FindWrapper` with a subset of the previously selected elements given the selector argument.

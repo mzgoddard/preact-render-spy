@@ -1,6 +1,6 @@
 {
   "name": "preact-render-spy",
-  "version": "1.0.0-rc.4",
+  "version": "1.0.0-rc.7",
   "description": "Render preact components with access to the produced virtual dom for testing.",
   "repository": {
     "type": "git",
@@ -11,12 +11,15 @@
   "scripts": {
     "test-jest": "jest --config jest.config.json",
     "test-jest-webpack": "jest-webpack",
-    "test": "npm run test-jest && npm run test-jest-webpack",
+    "test": "npm run test-jest",
     "pretest": "npm run lint",
     "lint": "eslint --ignore-pattern='!.eslintrc.js' --ext js,jsx src .eslintrc.js *.js"
   },
   "jest": {
-    "transform": {}
+    "transform": {},
+    "snapshotSerializers": [
+      "./snapshot"
+    ]
   },
   "keywords": [
     "preact",
@@ -47,19 +50,20 @@
     "babel-loader": "^7.0.0",
     "babel-preset-jest": "^20.0.3",
     "babel-preset-preact": "^1.1.0",
-    "eslint": "^4.1.1",
+    "eslint": "^4.2.0",
     "eslint-plugin-jest": "^20.0.3",
     "eslint-plugin-react": "^7.1.0",
     "jest": "^20.0.4",
-    "preact": "^8.1.0",
+    "preact": "^8.2.1",
     "typescript": "^2.4.1",
-    "webpack": "^2.6.1"
+    "webpack": "^2.7.0"
   },
   "peerDependencies": {
     "preact": "^8.1.0"
   },
   "dependencies": {
     "lodash.isequal": "^4.5.0",
-    "object.entries": "^1.0.4"
+    "object.entries": "^1.0.4",
+    "preact-render-to-string": "^3.6.3"
   }
 }

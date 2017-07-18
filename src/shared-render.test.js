@@ -2,45 +2,66 @@ const {h, Component} = require('preact');
 
 const {deep, shallow} = require('./preact-render-spy');
 
+class ReceivesProps extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {value: props.value};
+  }
+
+  componentWillReceiveProps(newProps) {
+    this.setState({value: `_${newProps.value}_`});
+  }
+
+  render(props, {value}) {
+    return (
+      <div>{value}</div>
+    );
+  }
+}
+
+class Div extends Component {
+  render() {
+    return <div />;
+  }
+}
+
+class DivChildren extends Component {
+  render({children}) {
+    return <div>{children}</div>;
+  }
+}
+
+class ClickCount extends Component {
+  constructor(...args) {
+    super(...args);
+
+    this.state = {count: 0};
+    this.onClick = this.onClick.bind(this);
+  }
+
+  onClick() {
+    this.setState({count: this.state.count + 1});
+  }
+
+  render({}, {count}) {
+    return <div onClick={this.onClick}>{count}</div>;
+  }
+}
+
+class DivCount extends Component {
+  render({count}) {
+    return <div>{count}</div>;
+  }
+}
+
+const DivCountStateless = ({count}) => <div>{count}</div>;
+
+const NullStateless = () => null;
+
+const Second = ({ children }) => <div>second {children}</div>;
+const First = () => <Second>first</Second>;
+
 const sharedTests = (name, func) => {
-  class Div extends Component {
-    render() {
-      return <div />;
-    }
-  }
-
-  class DivChildren extends Component {
-    render({children}) {
-      return <div>{children}</div>;
-    }
-  }
-
-  class ClickCount extends Component {
-    constructor(...args) {
-      super(...args);
-
-      this.state = {count: 0};
-      this.onClick = this.onClick.bind(this);
-    }
-
-    onClick() {
-      this.setState({count: this.state.count + 1});
-    }
-
-    render({}, {count}) {
-      return <div onClick={this.onClick}>{count}</div>;
-    }
-  }
-
-  class DivCount extends Component {
-    render({count}) {
-      return <div>{count}</div>;
-    }
-  }
-
-  const DivCountStateless = ({count}) => <div>{count}</div>;
-
-  const NullStateless = () => null;
 
   it(`${name}: renders into fragment`, () => {
     const context = func(<Div />);
@@ -136,6 +157,11 @@ const sharedTests = (name, func) => {
     expect(context.output()).toEqual(<div><span /></div>);
   });
 
+  it(`${name}: output returns null output by a Component`, () => {
+    const context = func(<NullStateless/>);
+    expect(context.output()).toEqual(null);
+  });
+
   it(`${name}: simulate an event`, () => {
     let count = 0;
     let context = func(<div onClick={() => {count++;}}/>);
@@ -153,7 +179,48 @@ const sharedTests = (name, func) => {
     expect(context.text()).toBe('foobar');
     expect(context.find('div').at(0).text()).toBe('foobar');
   });
+
+  it(`${name}: will call componentWillReceiveProps on the 'root' node`, () => {
+    const context = func(<ReceivesProps value="test" />);
+    expect(context.text()).toBe('test');
+    context.render(<ReceivesProps value="received" />);
+    expect(context.text()).toBe('_received_');
+  });
+
+  it(`${name}: output matches snapshot`, () => {
+    const context = func(<First />);
+    expect(context.output()).toMatchSnapshot();
+  });
+
+  it(`${name}: context matches snapshot`, () => {
+    const context = func(<First />);
+    expect(context).toMatchSnapshot();
+  });
+
+  it(`${name}: find matches snapshot`, () => {
+    const onClick = () => {};
+
+    const context = func(<div>
+      <span onClick={onClick}>click</span>
+      <span attr="text attr">text</span>
+      <span itsTrue={true} itsFalse={false}>bools</span>
+    </div>);
+    expect(context.find('span')).toMatchSnapshot();
+  });
+
+  it(`${name}: weird render cases toString matches snapshot`, () => {
+    const Test = () => <NullStateless><Div /></NullStateless>;
+    const context = func(<Test />);
+    expect(context.toString()).toMatchSnapshot();
+    expect(context.find('Div')).toMatchSnapshot();
+  });
 };
 
 sharedTests('deep', deep);
 sharedTests('shallow', shallow);
+
+
+it('output() is the same depth as the render method', () => {
+  expect(deep(<First />).output()).toEqual(<div>second first</div>);
+  expect(shallow(<First />).output()).toEqual(<Second>first</Second>);
+});

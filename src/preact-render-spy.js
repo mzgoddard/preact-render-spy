@@ -1,11 +1,13 @@
-const {render, rerender} = require('preact');
+const {render, rerender, h, Component} = require('preact');
 const isEqual = require('lodash.isequal');
+const renderToString = require('preact-render-to-string/jsx');
 
 const {isWhere} = require('./is-where');
 const {selToWhere} = require('./sel-to-where');
 
 const config = {
   SPY_PRIVATE_KEY: 'SPY_PRIVATE_KEY',
+  toStringOptions: {shallow: true, skipFalseAttributes: false},
 };
 
 const spyWalk = (context, vdom, depth) => {
@@ -126,7 +128,7 @@ const vdomIter = function* (vdomMap, vdom) {
     return;
   }
   yield vdom;
-  if (typeof vdom.nodeName === 'function') {
+  if (typeof vdom.nodeName === 'function' && vdomMap.has(vdom)) {
     yield* vdomIter(vdomMap, vdomMap.get(vdom));
   }
   else {
@@ -256,11 +258,81 @@ class FindWrapper {
       throw new Error('preact-render-spy: Must have only 1 result for .output().');
     }
 
-    if (typeof this[0].nodeName !== 'function') {
+    if (!this[0] || typeof this[0].nodeName !== 'function') {
       throw new Error('preact-render-spy: Must have a result of a preact class or function component for .output()');
     }
 
-    return this.context.vdomMap.get(this[0]);
+    const getOutput = node => {
+      if (!node || typeof node !== 'object') {
+        return node;
+      }
+      // recursively resolve the node
+      let nodeOutput = node;
+      while (this.context.vdomMap.has(nodeOutput)) {
+        nodeOutput = this.context.vdomMap.get(nodeOutput);
+      }
+      // in case the node output null or false...
+      if (!nodeOutput) {
+        return nodeOutput;
+      }
+      const clone = h(
+        nodeOutput.nodeName,
+        nodeOutput.attributes,
+        nodeOutput.children && nodeOutput.children.map(getOutput)
+      );
+
+      return clone;
+    };
+
+    return getOutput(this[0]);
+  }
+
+  toString() {
+    const render = (jsx, index) => {
+      if (typeof jsx.nodeName === 'function') {
+        jsx = this.at(index).output();
+      }
+      if (!jsx) return `{${JSON.stringify(jsx)}}`;
+      return renderToString(jsx, {}, config.toStringOptions, true);
+    };
+
+    const header = `preact-render-spy (${this.length} nodes)`;
+    if (!this.length) {
+      return header;
+    }
+    return `${header}
+-------
+${Array.from(this).map(render).join('\n')}
+`;
+  }
+}
+
+const setHiddenProp = (object, prop, value) => {
+  Object.defineProperty(object, prop, {
+    enumerable: false,
+    configurable: true,
+    value,
+  });
+  return value;
+};
+
+class ContextRootWrapper extends Component {
+  constructor(props) {
+    super(props);
+
+    const { vdom, renderRef } = props;
+    this.state = {vdom};
+
+    // setup the re-renderer - call the `renderRef` callback with a
+    // function that will re-render the content here
+    renderRef(vdom => {
+      this.setState({ vdom });
+      rerender();
+    });
+  }
+
+  render({}, {vdom}) {
+    return vdom;
   }
 }
 
@@ -268,54 +340,32 @@ class RenderContext extends FindWrapper {
   constructor({depth}) {
     super(null, []);
 
-    Object.defineProperties(this, {
-      context: {
-        value: this,
-        configurable: true,
-        enumerable: false,
-      },
-      renderedDepth: {
-        value: (depth || Infinity) - 1,
-        enumerable: false,
-      },
-      keyMap: {
-        value: new Map(),
-        enumerable: false,
-      },
-      depthMap: {
-        value: new Map(),
-        enumerable: false,
-      },
-      componentMap: {
-        value: new Map(),
-        enumerable: false,
-      },
-      componentNoopMap: {
-        value: new Map(),
-        enumerable: false,
-      },
-      vdomMap: {
-        value: new Map(),
-        enumerable: false,
-      },
-      fragment: {
-        value: document.createDocumentFragment(),
-        enumerable: false,
-      },
+    setHiddenProp(this, 'context', this);
+    setHiddenProp(this, 'renderedDepth', (depth || Infinity) - 1);
+    setHiddenProp(this, 'fragment', document.createDocumentFragment());
+
+    // Create our Maps
+    ['keyMap', 'depthMap', 'componentMap', 'componentNoopMap', 'vdomMap'].forEach(prop => {
+      setHiddenProp(this, prop, new Map());
     });
+
+    // Render an Empty ContextRootWrapper.  This sets up `this.contextRender`.
+    render({
+      nodeName: ContextRootWrapper,
+      attributes: {
+        vdom: null,
+        renderRef: contextRender => setHiddenProp(this, 'contextRender', contextRender),
+      },
+    }, this.fragment);
+
   }
 
   render(vdom) {
+    // Add what we need to be a FindWrapper:
     this[0] = vdom;
     this.length = 1;
-    Object.defineProperty(this, 'component', {
-      enumerable: false,
-      configurable: true,
-      value: render(
-        spyWalk(this, setVDom(this, 'root', vdom), 0),
-        this.fragment
-      ),
-    });
+    this.contextRender(spyWalk(this, setVDom(this, 'root', vdom), 0));
+
     return this;
   }
 }
@@ -330,3 +380,5 @@ exports.deep = deep;
 exports.default = deep;
 exports.render = deep;
 exports.shallow = shallow;
+exports.RenderContext = RenderContext;
+exports.FindWrapper = FindWrapper;

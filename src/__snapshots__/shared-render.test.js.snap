@@ -1,0 +1,72 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`deep: context matches snapshot 1`] = `
+preact-render-spy (1 nodes)
+-------
+<div>second first</div>
+
+`;
+
+exports[`deep: find matches snapshot 1`] = `
+preact-render-spy (3 nodes)
+-------
+<span onClick={[Function onClick]}>click</span>
+<span attr="text attr">text</span>
+<span
+  itsTrue={true}
+  itsFalse={false}
+>
+  bools
+</span>
+
+`;
+
+exports[`deep: output matches snapshot 1`] = `<div>second first</div>`;
+
+exports[`deep: weird render cases toString matches snapshot 1`] = `
+"preact-render-spy (1 nodes)
+-------
+{null}
+"
+`;
+
+exports[`deep: weird render cases toString matches snapshot 2`] = `preact-render-spy (0 nodes)`;
+
+exports[`shallow: context matches snapshot 1`] = `
+preact-render-spy (1 nodes)
+-------
+<Second>first</Second>
+
+`;
+
+exports[`shallow: find matches snapshot 1`] = `
+preact-render-spy (3 nodes)
+-------
+<span onClick={[Function onClick]}>click</span>
+<span attr="text attr">text</span>
+<span
+  itsTrue={true}
+  itsFalse={false}
+>
+  bools
+</span>
+
+`;
+
+exports[`shallow: output matches snapshot 1`] = `<Second>first</Second>`;
+
+exports[`shallow: weird render cases toString matches snapshot 1`] = `
+"preact-render-spy (1 nodes)
+-------
+<NullStateless>
+  <Div></Div>
+</NullStateless>
+"
+`;
+
+exports[`shallow: weird render cases toString matches snapshot 2`] = `
+preact-render-spy (1 nodes)
+-------
+<Div></Div>
+
+`;
