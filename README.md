@@ -111,7 +111,7 @@ This will return you a [`FindWrapper`](#findwrapper) which has other useful meth
 Like [`#find(selector)`](#rendercontextfindselector) `RenderContext` has the rest of `FindWrapper`'s methods.
 
 ### `RenderContext#render(jsx)`
-Re-renders the root level jsx node using the same depth initially requested.  This can be useful for testing
+Renders the root level jsx node using the same depth initially requested.  This can be useful for testing
 `componentWillReceiveProps` hooks.
 
 Example:
@@ -124,6 +124,9 @@ expect(context.find('div').text()).toBe('example');
 context.render(<Node name="second" />);
 expect(context.find('div').text()).toBe('second');
 ```
+
+### `RenderContext.rerender()`
+Calls `preact.rerender()` which performs any state changes in the render queue.
 
 ### `FindWrapper`
 Contains a selection of nodes from `RenderContext#find(selector)`.
@@ -141,14 +144,58 @@ Returns the value of the `name` attribute on the jsx node.
 Requires a single node selection to work.
 Returns a copy of the attributes passed to the jsx node.
 
+### `FindWrapper#component()`
+Requires a single node, which is a class based component.
+Returns the **Spied** component. preact-render-spy creates a subclass of your components that enable us to spy things, you'll get a `class Spy extends YourComponent` instance.
+
+Example:
+```jsx
+const context = shallow(<MyComponent />);
+expect(context.component()).toBeInstanceOf(MyComponent);
+```
+
 ### `FindWrapper#contains(vdom)`
 Searches for any children matching the vdom or text passed.
 
-### `FindWrapper#text()`
-Returns the flattened string of any text children of any child component.
+### `FindWrapper#filter(selector)`
+Returns a new `FindWrapper` with a subset of the previously selected elements given the selector argument.
+
+Uses the same possible selectors as [`RenderContext#find(selector)`](#rendercontextfindselector).
+
+### `FindWrapper#find(selector)`
+Selects descendents of the elements previously selected. Returns a new `FindWrapper` with the newly selected elements.
+
+Uses the same possible selectors as [`RenderContext#find(selector)`](#rendercontextfindselector).
+
+
+### `FindWrapper#setState(newState)`
+Requires a single node, which is a class based component.
+Allows you to set the state of a rendered component.  Automatically `rerender()`s the view.
+
+Example:
+```jsx
+const context = shallow(<ClickCounter />);
+context.setState({ count: 2 });
+expect(context.text()).toEqual('2');
+```
 
 ### `FindWrapper#simulate(event, ...args)`
 Looks for an attribute properly named `onEvent` or `onEventCapture` and calls it, passing the arguments.
+
+### `FindWrapper#state(key)`
+Requires a single node, which is a class based component.
+Reads the current state from the component. When passed `key`, this is essentially shorthand `state(key) === state()[key]`.
+
+Example:
+```jsx
+const context = shallow(<ClickCounter />);
+expect(context.state()).toEqual({ count: 0 });
+context.find('[onClick]').simulate('click');
+expect(context.state('count')).toEqual(1);
+```
+
+### `FindWrapper#text()`
+Returns the flattened string of any text children of any child component.
 
 ### `FindWrapper#output()`
 Requires a single Component or functional node. Returns the vdom output of the given component.
@@ -165,16 +212,6 @@ expect(deep(<First />).output()).toEqual(<div>second first</div>);
 // rendered shallow, we get the <Second> jsx node back
 expect(shallow(<First />).output()).toEqual(<Second>first</Second>);
 ```
-
-### `FindWrapper#filter(selector)`
-Returns a new `FindWrapper` with a subset of the previously selected elements given the selector argument.
-
-Uses the same possible selectors as [`RenderContext#find(selector)`](#rendercontextfindselector).
-
-### `FindWrapper#find(selector)`
-Selects descendents of the elements previously selected. Returns a new `FindWrapper` with the newly selected elements.
-
-Uses the same possible selectors as [`RenderContext#find(selector)`](#rendercontextfindselector).
 
 ## Examples
 
