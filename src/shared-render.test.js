@@ -233,10 +233,15 @@ const sharedTests = (name, func) => {
   it(`${name}: can retrieve deeper component instances after renders`, () => {
     const context = func(<div><ClickCount /></div>);
 
-    expect(context.find('ClickCount').component()).toBeInstanceOf(ClickCount);
+    const component = context.find('ClickCount').component();
+    expect(component).toBeInstanceOf(ClickCount);
 
     context.render(<div><ClickCount /></div>);
-    expect(context.find('ClickCount').component()).toBeInstanceOf(ClickCount);
+    // This test ensures that even though this <ClickCount /> is not the same JSX node used
+    // in the initial context render, find('ClickCount').component()
+    // will still retrieve the same component
+    expect(context.find('ClickCount').component()).toEqual(component);
+
   });
 
   it(`${name}: can retrieve and set component state`, () => {
