@@ -73,6 +73,7 @@ const createClassSpy = (context, Component) => {
     constructor(_props, ...args) {
       const [spyKey, spyDepth, props] = popSpyKey(_props);
       super(props, ...args);
+      context.componentMap.set(spyKey, this);
       context.keyMap.set(this, spyKey);
       context.depthMap.set(this, spyDepth);
     }
@@ -254,6 +255,34 @@ class FindWrapper {
     );
   }
 
+  component() {
+    if (this.length !== 1) {
+      throw new Error('preact-render-spy: component method can only be used on a single node');
+    }
+
+    const ref = this.context.componentMap.get(this[0]);
+
+    if (!ref) {
+      throw new Error('preact-render-spy: not a component node, no instance to return');
+    }
+
+    return ref;
+  }
+
+  setState(...args) {
+    const val = this.component().setState(...args);
+    rerender();
+    return val;
+  }
+
+  state(key) {
+    const state = this.component().state;
+    if (key) {
+      return state[key];
+    }
+    return state;
+  }
+
   output() {
     if (this.length > 1 || this.length === 0) {
       throw new Error('preact-render-spy: Must have only 1 result for .output().');
@@ -369,6 +398,10 @@ class RenderContext extends FindWrapper {
 
     return this;
   }
+
+  rerender() {
+    rerender();
+  }
 }
 
 const deep = (vdom, {depth = Infinity} = {}) => new RenderContext({depth}).render(vdom);
@@ -380,6 +413,7 @@ exports.config = config;
 exports.deep = deep;
 exports.default = deep;
 exports.render = deep;
+exports.rerender = rerender;
 exports.shallow = shallow;
 exports.RenderContext = RenderContext;
 exports.FindWrapper = FindWrapper;

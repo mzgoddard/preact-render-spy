@@ -223,6 +223,23 @@ const sharedTests = (name, func) => {
     const Deeper = () => <div><Text /></div>;
     expect(func(<Deeper />)).toMatchSnapshot();
   });
+
+  it(`${name}: can retrieve component instance`, () => {
+    const context = func(<ClickCount />);
+
+    expect(context.component()).toBeInstanceOf(ClickCount);
+  });
+
+  it(`${name}: can retrieve and set component state`, () => {
+    const context = func(<ClickCount />);
+
+    expect(context.state()).toEqual({ count: 0 });
+    expect(context.state('count')).toEqual(0);
+
+    context.setState({ count: 2 });
+
+    expect(context.text()).toEqual('2');
+  });
 };
 
 sharedTests('deep', deep);
