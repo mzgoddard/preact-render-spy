@@ -219,7 +219,7 @@ There are many examples in the source files.  Some [tests specific to shallow](h
 
 ### Simulate Clicks:
 ```jsx
-class Node extends Component {
+class ClickCount extends Component {
   constructor(...args) {
     super(...args);
 
@@ -235,7 +235,7 @@ class Node extends Component {
     return <div onClick={this.onClick}>{count}</div>;
   }
 }
-const context = shallow(<Node/>);
+const context = shallow(<ClickCount/>);
 expect(context.find('div').contains('0')).toBeTruthy();
 context.find('[onClick]').simulate('click');
 expect(context.find('div').contains('1')).toBeTruthy();
