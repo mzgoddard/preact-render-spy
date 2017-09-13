@@ -73,7 +73,6 @@ const createClassSpy = (context, Component) => {
     constructor(_props, ...args) {
       const [spyKey, spyDepth, props] = popSpyKey(_props);
       super(props, ...args);
-      context.componentMap.set(spyKey, this);
       context.keyMap.set(this, spyKey);
       context.depthMap.set(this, spyDepth);
     }
@@ -90,6 +89,7 @@ const createClassSpy = (context, Component) => {
     render(...args) {
       const spyKey = context.keyMap.get(this);
       const spyDepth = context.depthMap.get(this);
+      context.componentMap.set(spyKey, this);
       return spyWalk(context, setVDom(context, spyKey, super.render(...args)), spyDepth + 1);
     }
   }

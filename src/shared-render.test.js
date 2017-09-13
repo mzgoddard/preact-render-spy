@@ -230,6 +230,15 @@ const sharedTests = (name, func) => {
     expect(context.component()).toBeInstanceOf(ClickCount);
   });
 
+  it(`${name}: can retrieve deeper component instances after renders`, () => {
+    const context = func(<div><ClickCount /></div>);
+
+    expect(context.find('ClickCount').component()).toBeInstanceOf(ClickCount);
+
+    context.render(<div><ClickCount /></div>);
+    expect(context.find('ClickCount').component()).toBeInstanceOf(ClickCount);
+  });
+
   it(`${name}: can retrieve and set component state`, () => {
     const context = func(<ClickCount />);
 
