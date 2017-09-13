@@ -183,3 +183,56 @@ context.find('[onClick]').simulate('click');
 expect(context.find('div').contains('1')).toBeTruthy();
 ```
 
+### Testing Lifecycle Events
+
+```jsx
+import { h, Component } from 'preact';
+import { shallow } from 'preact-render-spy';
+
+// Example of testing componentWillUnmount
+class Unmount extends Component {
+
+  componentWillUnmount() {
+    this.props.onUnmount(this);
+  }
+
+  render() {
+    return <div>Unmount me</div>;
+  }
+}
+
+it('triggers unmount', () => {
+  const trigger = jest.fn();
+  const context = shallow(<Unmount onUnmount={trigger} />);
+  expect(trigger).not.toHaveBeenCalled();
+
+  // This will trigger the componentWillUnmount
+  context.render(null);
+  expect(trigger).toHaveBeenCalled();
+});
+
+// Example of testing some side effects with componentWillReceiveProps
+class ReceivesProps extends Component {
+  constructor(props) {
+    this.state = { value: props.value };
+  }
+
+  componentWillReceiveProps({ value }) {
+    if (value !== this.props.value) {
+      this.setState({ value: `_${value}_` })
+    }
+  }
+
+  render() {
+    return <div>{this.state.value}</div>
+  }
+}
+
+it('receives props', () => {
+  const context = shallow(<ReceivesProps value="test" />);
+  expect(context.text()).toBe('test');
+
+  context.render(<ReceivesProps value="second" />);
+  expect(context.text()).toBe('_second_');
+});
+```
