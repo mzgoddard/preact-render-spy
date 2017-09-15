@@ -254,6 +254,41 @@ const sharedTests = (name, func) => {
 
     expect(context.text()).toEqual('2');
   });
+
+  describe('warnings', () => {
+    const warn = console.warn;
+    let spy;
+    let context;
+    let found;
+
+    beforeEach(() => {
+      spy = jest.fn();
+      console.warn = spy;
+      context = func(<div><ClickCount /></div>);
+      found = context.find('ClickCount');
+      context.render(<div><ClickCount /></div>);
+    });
+
+    afterEach(() => {
+      console.warn = warn;
+    });
+
+    it(`${name}: warns when performing at on stale finds`, () => {
+      found.at(0);
+      expect(spy).toHaveBeenCalled();
+    });
+
+    it(`${name}: warns when performing component on stale finds`, () => {
+      found.component();
+      expect(spy).toHaveBeenCalled();
+    });
+
+    it(`${name}: warns when performing attrs on stale finds`, () => {
+      found.attrs();
+      expect(spy).toHaveBeenCalled();
+    });
+
+  });
 };
 
 sharedTests('deep', deep);
