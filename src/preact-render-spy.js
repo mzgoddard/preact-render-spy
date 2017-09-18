@@ -40,6 +40,7 @@ const popSpyKey = _props => {
 
 const setVDom = (context, spyKey, vdom) => {
   context.vdomMap.set(spyKey, vdom);
+  context.vdomRevision++;
   return vdom;
 };
 
@@ -158,12 +159,8 @@ const vdomFilter = (pred, vdomMap, vdom) => {
 };
 
 const verifyFoundNodes = wrapper => {
-  const currentNodes = new Set([...vdomWalk(wrapper.context.vdomMap, [wrapper.context[0]])]);
-  for (let x = 0; x < wrapper.length; x++) {
-    if (!currentNodes.has(wrapper[x])) {
-      console.warn('preact-render-spy: Warning! Performing operation on stale find() result.');
-      return;
-    }
+  if (wrapper.vdomRevision !== wrapper.context.vdomRevision) {
+    console.warn('preact-render-spy: Warning! Performing operation on stale find() result.');
   }
 };
 
@@ -171,7 +168,8 @@ class FindWrapper {
   constructor(context, _iter, selector) {
     // Set a non-enumerable property for context. In case a user does an deep
     // equal comparison this removes the chance for recursive comparisons.
-    Object.defineProperty(this, 'context', {configurable: true, enumerable: false, value: context});
+    setHiddenProp(this, 'context', context || this);
+    setHiddenProp(this, 'vdomRevision', this.context.vdomRevision);
     this.length = 0;
     let iter = _iter;
     if (selector) {
@@ -362,6 +360,7 @@ const setHiddenProp = (object, prop, value) => {
   Object.defineProperty(object, prop, {
     enumerable: false,
     configurable: true,
+    writable: true,
     value,
   });
   return value;
@@ -393,7 +392,9 @@ class RenderContext extends FindWrapper {
 
     setHiddenProp(this, 'context', this);
     setHiddenProp(this, 'renderedDepth', (depth || Infinity) - 1);
+
     setHiddenProp(this, 'fragment', config.createFragment());
+    setHiddenProp(this, 'vdomRevision', 0);
 
     // Create our Maps
     ['keyMap', 'depthMap', 'componentMap', 'componentNoopMap', 'vdomMap'].forEach(prop => {
