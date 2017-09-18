@@ -223,6 +223,72 @@ const sharedTests = (name, func) => {
     const Deeper = () => <div><Text /></div>;
     expect(func(<Deeper />)).toMatchSnapshot();
   });
+
+  it(`${name}: can retrieve component instance`, () => {
+    const context = func(<ClickCount />);
+
+    expect(context.component()).toBeInstanceOf(ClickCount);
+  });
+
+  it(`${name}: can retrieve deeper component instances after renders`, () => {
+    const context = func(<div><ClickCount /></div>);
+
+    const component = context.find('ClickCount').component();
+    expect(component).toBeInstanceOf(ClickCount);
+
+    context.render(<div><ClickCount /></div>);
+    // This test ensures that even though this <ClickCount /> is not the same JSX node used
+    // in the initial context render, find('ClickCount').component()
+    // will still retrieve the same component
+    expect(context.find('ClickCount').component()).toEqual(component);
+
+  });
+
+  it(`${name}: can retrieve and set component state`, () => {
+    const context = func(<ClickCount />);
+
+    expect(context.state()).toEqual({ count: 0 });
+    expect(context.state('count')).toEqual(0);
+
+    context.setState({ count: 2 });
+
+    expect(context.text()).toEqual('2');
+  });
+
+  describe('warnings', () => {
+    const warn = console.warn;
+    let spy;
+    let context;
+    let found;
+
+    beforeEach(() => {
+      spy = jest.fn();
+      console.warn = spy;
+      context = func(<div><ClickCount /></div>);
+      found = context.find('ClickCount');
+      context.render(<div><ClickCount /></div>);
+    });
+
+    afterEach(() => {
+      console.warn = warn;
+    });
+
+    it(`${name}: warns when performing at on stale finds`, () => {
+      found.at(0);
+      expect(spy).toHaveBeenCalled();
+    });
+
+    it(`${name}: warns when performing component on stale finds`, () => {
+      found.component();
+      expect(spy).toHaveBeenCalled();
+    });
+
+    it(`${name}: warns when performing attrs on stale finds`, () => {
+      found.attrs();
+      expect(spy).toHaveBeenCalled();
+    });
+
+  });
 };
 
 sharedTests('deep', deep);

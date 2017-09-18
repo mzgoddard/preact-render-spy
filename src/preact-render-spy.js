@@ -40,6 +40,7 @@ const popSpyKey = _props => {
 
 const setVDom = (context, spyKey, vdom) => {
   context.vdomMap.set(spyKey, vdom);
+  context.vdomRevision++;
   return vdom;
 };
 
@@ -89,6 +90,7 @@ const createClassSpy = (context, Component) => {
     render(...args) {
       const spyKey = context.keyMap.get(this);
       const spyDepth = context.depthMap.get(this);
+      context.componentMap.set(spyKey, this);
       return spyWalk(context, setVDom(context, spyKey, super.render(...args)), spyDepth + 1);
     }
   }
@@ -156,11 +158,18 @@ const vdomFilter = (pred, vdomMap, vdom) => {
   return Array.from(skip(1, vdomIter(vdomMap, vdom))).filter(pred);
 };
 
+const verifyFoundNodes = wrapper => {
+  if (wrapper.vdomRevision !== wrapper.context.vdomRevision) {
+    console.warn('preact-render-spy: Warning! Performing operation on stale find() result.');
+  }
+};
+
 class FindWrapper {
   constructor(context, _iter, selector) {
     // Set a non-enumerable property for context. In case a user does an deep
     // equal comparison this removes the chance for recursive comparisons.
-    Object.defineProperty(this, 'context', {configurable: true, enumerable: false, value: context});
+    setHiddenProp(this, 'context', context || this);
+    setHiddenProp(this, 'vdomRevision', this.context.vdomRevision);
     this.length = 0;
     let iter = _iter;
     if (selector) {
@@ -180,6 +189,7 @@ class FindWrapper {
     if (index >= this.length) {
       throw new Error(`preact-render-spy: Must have enough results for .at(${index}).`);
     }
+    verifyFoundNodes(this);
 
     return new FindWrapper(this.context, [this[index]]);
   }
@@ -188,6 +198,7 @@ class FindWrapper {
     if (this.length > 1 || this.length === 0) {
       throw new Error(`preact-render-spy: Must have only 1 result for .attr(${name})`);
     }
+    verifyFoundNodes(this);
 
     const item = this[0];
     if (
@@ -206,6 +217,7 @@ class FindWrapper {
     if (this.length > 1 || this.length === 0) {
       throw new Error('preact-render-spy: Must have only 1 result for .attrs().');
     }
+    verifyFoundNodes(this);
 
     return Object.assign({}, this[0].attributes);
   }
@@ -214,6 +226,7 @@ class FindWrapper {
    * Return the text of all nested children concatenated together.
    */
   text() {
+    verifyFoundNodes(this);
     return Array.from(vdomWalk(this.context.vdomMap, Array.from(this)))
       // Filter for strings (text nodes)
       .filter(value => typeof value === 'string')
@@ -222,12 +235,14 @@ class FindWrapper {
   }
 
   contains(vdom) {
+    verifyFoundNodes(this);
     return Array.from(vdomWalk(this.context.vdomMap, Array.from(this)))
       .filter(value => isEqual(vdom, value))
       .length > 0;
   }
 
   simulate(event, ...args) {
+    verifyFoundNodes(this);
     for (let i = 0; i < this.length; i++) {
       const vdom = this[i];
       const eventlc = event.toLowerCase();
@@ -244,14 +259,45 @@ class FindWrapper {
   }
 
   find(selector) {
+    verifyFoundNodes(this);
     return new FindWrapper(this.context, Array.from(this), selector);
   }
 
   filter(selector) {
+    verifyFoundNodes(this);
     return new FindWrapper(
       this.context,
       Array.from(this).filter(isWhere(selToWhere(selector)))
     );
+  }
+
+  component() {
+    if (this.length !== 1) {
+      throw new Error('preact-render-spy: component method can only be used on a single node');
+    }
+    verifyFoundNodes(this);
+
+    const ref = this.context.componentMap.get(this[0]);
+
+    if (!ref) {
+      throw new Error('preact-render-spy: not a component node, no instance to return');
+    }
+
+    return ref;
+  }
+
+  setState(...args) {
+    const val = this.component().setState(...args);
+    rerender();
+    return val;
+  }
+
+  state(key) {
+    const state = this.component().state;
+    if (key) {
+      return state[key];
+    }
+    return state;
   }
 
   output() {
@@ -262,6 +308,7 @@ class FindWrapper {
     if (!this[0] || typeof this[0].nodeName !== 'function') {
       throw new Error('preact-render-spy: Must have a result of a preact class or function component for .output()');
     }
+    verifyFoundNodes(this);
 
     const getOutput = node => {
       if (!node || typeof node !== 'object') {
@@ -289,6 +336,7 @@ class FindWrapper {
   }
 
   toString() {
+    verifyFoundNodes(this);
     const render = (jsx, index) => {
       if (typeof jsx.nodeName === 'function') {
         jsx = this.at(index).output();
@@ -312,6 +360,7 @@ const setHiddenProp = (object, prop, value) => {
   Object.defineProperty(object, prop, {
     enumerable: false,
     configurable: true,
+    writable: true,
     value,
   });
   return value;
@@ -343,7 +392,9 @@ class RenderContext extends FindWrapper {
 
     setHiddenProp(this, 'context', this);
     setHiddenProp(this, 'renderedDepth', (depth || Infinity) - 1);
+
     setHiddenProp(this, 'fragment', config.createFragment());
+    setHiddenProp(this, 'vdomRevision', 0);
 
     // Create our Maps
     ['keyMap', 'depthMap', 'componentMap', 'componentNoopMap', 'vdomMap'].forEach(prop => {
@@ -369,6 +420,10 @@ class RenderContext extends FindWrapper {
 
     return this;
   }
+
+  rerender() {
+    rerender();
+  }
 }
 
 const deep = (vdom, {depth = Infinity} = {}) => new RenderContext({depth}).render(vdom);
@@ -380,6 +435,7 @@ exports.config = config;
 exports.deep = deep;
 exports.default = deep;
 exports.render = deep;
+exports.rerender = rerender;
 exports.shallow = shallow;
 exports.RenderContext = RenderContext;
 exports.FindWrapper = FindWrapper;
