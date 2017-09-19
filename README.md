@@ -241,13 +241,12 @@ context.find('[onClick]').simulate('click');
 expect(context.find('div').contains('1')).toBeTruthy();
 ```
 
-### Testing Lifecycle Events
+### Testing componentWillUnmount
 
 ```jsx
 import { h, Component } from 'preact';
 import { shallow } from 'preact-render-spy';
 
-// Example of testing componentWillUnmount
 class Unmount extends Component {
 
   componentWillUnmount() {
@@ -268,8 +267,14 @@ it('triggers unmount', () => {
   context.render(null);
   expect(trigger).toHaveBeenCalled();
 });
+```
 
-// Example of testing some side effects with componentWillReceiveProps
+### Testing componentWillReceiveProps
+
+```jsx
+import { h, Component } from 'preact';
+import { shallow } from 'preact-render-spy';
+
 class ReceivesProps extends Component {
   constructor(props) {
     this.state = { value: props.value };
