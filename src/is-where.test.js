@@ -30,6 +30,21 @@ it('tests Component names', () => {
   expect(isWhere({nodeName: 'displayName'})(<DisplayNamedFunc />)).toBeTruthy();
 });
 
+it('tests vdom names', () => {
+  class Node extends Component {}
+  const NodelessConst = () => {};
+  function NodelessFunc() {}
+  function DisplayNamedFunc() {}
+  DisplayNamedFunc.displayName = 'displayName';
+
+  expect(isWhere(<Node />)(<Node />)).toBeTruthy();
+  expect(isWhere(<NodelessConst />)(<NodelessConst />)).toBeTruthy();
+  expect(isWhere(<NodelessFunc />)(<NodelessFunc />)).toBeTruthy();
+  expect(isWhere(<DisplayNamedFunc />)(<DisplayNamedFunc />)).toBeTruthy();
+});
+
+
+
 it('tests nested attributes', () => {
   expect(isWhere({attributes: {class: 'class'}})(<div class="class" />))
     .toBeTruthy();

@@ -101,8 +101,12 @@ We may expand this selector language in future versions, but it acheives our goa
 * `find('#selector')` - searches for any nodes with an `id` attribute that matches `selector`
 * `find('[selector]')` - searches for any nodes which have an attribute named `selector`
 * `find('Selector')` - searches for any nodes which have a nodeName that matches `Selector`,
-  this wills search for function/classes whos `name` is `Selector`, or `displayName` is `Selector`.
+  this will search for function/classes whos `name` is `Selector`, or `displayName` is `Selector`.
   If the `Selector` starts with a lower case letter, it will also check for tags like `div`.
+* `find(<Selector simple="attributes" class="working" />)` - searches for any nodes whos nodeName equals `Selector`
+  and attributes match the ones given in the JSX.  **NOTE:** This does not support children, just simple attributes.
+  Can be useful to find components from minified output that don't include display names.
+  `.find(<ImportedComponent />)` will look for JSX nodes using the same `ImportedComponent` function.
 
 This will return you a [`FindWrapper`](#findwrapper) which has other useful methods for testing.
 
