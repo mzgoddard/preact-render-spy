@@ -264,6 +264,20 @@ const sharedTests = (name, func) => {
     expect(context.text()).toEqual('2');
   });
 
+  it(`${name}: find by class works with null and undefined class and className`, () => {
+    const context = func(<div class={null}>test</div>);
+    expect(() => context.find('.test')).not.toThrow();
+
+    context.render(<div className={null}>test</div>);
+    expect(() => context.find('.test')).not.toThrow();
+
+    context.render(<div class={undefined}>test</div>);
+    expect(() => context.find('.test')).not.toThrow();
+
+    context.render(<div className={undefined}>test</div>);
+    expect(() => context.find('.test')).not.toThrow();
+  });
+
   describe('warnings', () => {
     const warn = console.warn;
     let spy;
