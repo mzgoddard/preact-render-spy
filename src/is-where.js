@@ -82,7 +82,10 @@ const _isWhere = (where, target) => {
 
     if (key === 'class' || key === 'className') {
       let attr = target.class || target.className;
-      if (typeof attr === 'object') {
+      if (!attr) {
+        attr = [];
+      }
+      else if (typeof attr === 'object') {
         attr = Object.keys(attr).filter(key => attr[key]);
       }
       else if (typeof attr === 'string') {

@@ -11,10 +11,8 @@ it('tests class names', () => {
   expect(testClass(<div class="test" />)).toBeTruthy();
   expect(testClass(<div class="nottest" />)).toBeFalsy();
   expect(testClass(<div class="nottest and test" />)).toBeTruthy();
-  expect(testClass(<div class={{nottest: false, test: true }} />)).toBeTruthy();
-  expect(testClass(<div class={{test: false}} />)).toBeFalsy();
+  expect(testClass(<div className={null} />)).toBeFalsy();
   expect(testClass(<div className="test" />)).toBeTruthy();
-  expect(testClass(<div className={{test: true}} />)).toBeTruthy();
 });
 
 it('tests Component names', () => {

@@ -265,16 +265,16 @@ const sharedTests = (name, func) => {
   });
 
   it(`${name}: find by class works with null and undefined class and className`, () => {
-    const context = func(<div class={null}>test</div>);
+    const context = func(<DivChildren><div class={null}>test</div></DivChildren>);
     expect(() => context.find('.test')).not.toThrow();
 
-    context.render(<div className={null}>test</div>);
+    context.render(<DivChildren><div className={null}>test</div></DivChildren>);
     expect(() => context.find('.test')).not.toThrow();
 
-    context.render(<div class={undefined}>test</div>);
+    context.render(<DivChildren><div class={undefined}>test</div></DivChildren>);
     expect(() => context.find('.test')).not.toThrow();
 
-    context.render(<div className={undefined}>test</div>);
+    context.render(<DivChildren><div className={undefined}>test</div></DivChildren>);
     expect(() => context.find('.test')).not.toThrow();
   });
 
