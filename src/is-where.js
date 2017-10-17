@@ -85,11 +85,11 @@ const _isWhere = (where, target) => {
       if (!attr) {
         attr = [];
       }
-      else if (typeof attr === 'object') {
-        attr = Object.keys(attr).filter(key => attr[key]);
-      }
       else if (typeof attr === 'string') {
         attr = attr.split(/\s+/);
+      }
+      else {
+        return false;
       }
 
       if (!attr || attr.indexOf(value) === -1) {
