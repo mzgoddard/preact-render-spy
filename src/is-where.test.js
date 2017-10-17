@@ -11,10 +11,8 @@ it('tests class names', () => {
   expect(testClass(<div class="test" />)).toBeTruthy();
   expect(testClass(<div class="nottest" />)).toBeFalsy();
   expect(testClass(<div class="nottest and test" />)).toBeTruthy();
-  expect(testClass(<div class={{nottest: false, test: true }} />)).toBeTruthy();
-  expect(testClass(<div class={{test: false}} />)).toBeFalsy();
+  expect(testClass(<div className={null} />)).toBeFalsy();
   expect(testClass(<div className="test" />)).toBeTruthy();
-  expect(testClass(<div className={{test: true}} />)).toBeTruthy();
 });
 
 it('tests Component names', () => {
@@ -29,6 +27,21 @@ it('tests Component names', () => {
   expect(isWhere({nodeName: 'NodelessFunc'})(<NodelessFunc />)).toBeTruthy();
   expect(isWhere({nodeName: 'displayName'})(<DisplayNamedFunc />)).toBeTruthy();
 });
+
+it('tests vdom names', () => {
+  class Node extends Component {}
+  const NodelessConst = () => {};
+  function NodelessFunc() {}
+  function DisplayNamedFunc() {}
+  DisplayNamedFunc.displayName = 'displayName';
+
+  expect(isWhere(<Node />)(<Node />)).toBeTruthy();
+  expect(isWhere(<NodelessConst />)(<NodelessConst />)).toBeTruthy();
+  expect(isWhere(<NodelessFunc />)(<NodelessFunc />)).toBeTruthy();
+  expect(isWhere(<DisplayNamedFunc />)(<DisplayNamedFunc />)).toBeTruthy();
+});
+
+
 
 it('tests nested attributes', () => {
   expect(isWhere({attributes: {class: 'class'}})(<div class="class" />))

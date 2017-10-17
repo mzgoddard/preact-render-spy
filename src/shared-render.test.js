@@ -153,6 +153,15 @@ const sharedTests = (name, func) => {
     expect(context.filter('span').length).toBe(0);
   });
 
+  it(`${name}: filters components using vdom`, () => {
+    const context = func(<div><NullStateless class="first" something={null} /><NullStateless class="second" /></div>);
+    expect(context.find(<NullStateless />).length).toBe(2);
+    expect(context.find(<NullStateless class="first" />).length).toBe(1);
+    expect(context.find(<NullStateless something={null} />).length).toBe(1);
+    expect(context.filter(<div />).length).toBe(1);
+    expect(context.filter(<span />).length).toBe(0);
+  });
+
   it(`${name}: output returns vdom output by a Component`, () => {
     const context = func(<DivChildren><span /></DivChildren>);
     expect(() => context.find('div').output()).toThrow();
@@ -253,6 +262,20 @@ const sharedTests = (name, func) => {
     context.setState({ count: 2 });
 
     expect(context.text()).toEqual('2');
+  });
+
+  it(`${name}: find by class works with null and undefined class and className`, () => {
+    const context = func(<DivChildren><div class={null}>test</div></DivChildren>);
+    expect(() => context.find('.test')).not.toThrow();
+
+    context.render(<DivChildren><div className={null}>test</div></DivChildren>);
+    expect(() => context.find('.test')).not.toThrow();
+
+    context.render(<DivChildren><div class={undefined}>test</div></DivChildren>);
+    expect(() => context.find('.test')).not.toThrow();
+
+    context.render(<DivChildren><div className={undefined}>test</div></DivChildren>);
+    expect(() => context.find('.test')).not.toThrow();
   });
 
   describe('warnings', () => {
