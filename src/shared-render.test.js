@@ -129,6 +129,15 @@ const sharedTests = (name, func) => {
     expect(context.find('.first').attr('class')).toBe('first');
   });
 
+  it(`${name}: attr() and awkward values`, () => {
+    const context = func(<div false={false} true={true} null={null} zero={0} empty="" />);
+    expect(context.attr('false')).toEqual(false);
+    expect(context.attr('true')).toEqual(true);
+    expect(context.attr('null')).toEqual(null);
+    expect(context.attr('zero')).toEqual(0);
+    expect(context.attr('empty')).toEqual('');
+  });
+
   it(`${name}: attrs() returns all attributes as an object`, () => {
     const context = func(<DivChildren count={1} value={'abc'}><div class="first" name="first" /><div class="second" name="second" /></DivChildren>);
     expect(() => context.find('div').attrs()).toThrow();

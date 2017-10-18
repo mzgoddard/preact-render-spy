@@ -203,8 +203,7 @@ class FindWrapper {
     const item = this[0];
     if (
       typeof item === 'object' &&
-      item.attributes &&
-      item.attributes[name]
+      item.attributes
     ) {
       return item.attributes[name];
     }
