@@ -171,6 +171,12 @@ const sharedTests = (name, func) => {
     expect(context.filter(<span />).length).toBe(0);
   });
 
+  it(`${name}: reduce components`, () => {
+    const context = func(<div><NullStateless class="first" value={1} /><NullStateless value={2} /></div>);
+    expect(context.find('NullStateless').reduce((sum, n) => sum + n.attr('value'), 1)).toEqual(4);
+    expect(() => context.find('NullStateless').reduce((sum, n) => sum + n.attr('value'))).toThrow();
+  });
+
   it(`${name}: output returns vdom output by a Component`, () => {
     const context = func(<DivChildren><span /></DivChildren>);
     expect(() => context.find('div').output()).toThrow();

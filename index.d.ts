@@ -38,6 +38,11 @@ export interface FindWrapper<P, S> {
      **/
     find<Q, T>(selector: string): FindWrapper<Q, T>;
 
+    /**
+     * Applies provided function to every element, returning a single value.
+     **/
+    reduce<T>(fn: (prevVal: T, wrapper: this, index: number) => T, initialValue: T): T;
+
     /** Requires a single `Component` or functional node. Returns the raw vdom output of the given component. */
     output(): preact.VNode;
 

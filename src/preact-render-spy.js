@@ -270,6 +270,17 @@ class FindWrapper {
     );
   }
 
+  reduce(fn, initialValue) {
+    verifyFoundNodes(this);
+    if (initialValue === undefined) {
+      throw new Error('preact-render-spy: reduce initialValue is missing');
+    }
+    return Array.from(this).reduce(
+      (accumulator, vnode, index) => fn(accumulator, new FindWrapper(this.context, [vnode]), index),
+      initialValue
+    );
+  }
+
   component() {
     if (this.length !== 1) {
       throw new Error('preact-render-spy: component method can only be used on a single node');
