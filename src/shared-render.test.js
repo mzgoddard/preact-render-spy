@@ -171,6 +171,14 @@ const sharedTests = (name, func) => {
     expect(context.filter(<span />).length).toBe(0);
   });
 
+  it(`${name}: filterWhere() filters components using predicates `, () => {
+    const context = func(<div><NullStateless class="first" /><NullStateless class="second" /></div>);
+    expect(context.find('NullStateless').length).toBe(2);
+    expect(context.find('NullStateless').filterWhere(() => true).length).toBe(2);
+    expect(context.find('NullStateless').filterWhere(() => false).length).toBe(0);
+    expect(context.find('NullStateless').filterWhere(n => n.attr('class') === 'first').length).toBe(1);
+  });
+
   it(`${name}: output returns vdom output by a Component`, () => {
     const context = func(<DivChildren><span /></DivChildren>);
     expect(() => context.find('div').output()).toThrow();

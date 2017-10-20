@@ -33,6 +33,12 @@ export interface FindWrapper<P, S> {
     filter<Q, T>(selector: string): FindWrapper<Q, T>;
 
     /**
+     * Returns a new `FindWrapper` with a subset of the previously selected elements which, when passed into the
+     * provided predicate function, return true.
+     **/
+    filterWhere<Q, T>(predicate:(element: FindWrapper<Q, T>, index: number) => boolean): FindWrapper<Q, T>;
+
+    /**
      * Selects descendents of the elements previously selected. Returns a new `FindWrapper` with the newly selected
      * elements.
      **/

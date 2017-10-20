@@ -166,6 +166,9 @@ Returns a new `FindWrapper` with a subset of the previously selected elements gi
 
 Uses the same possible selectors as [`RenderContext#find(selector)`](#rendercontextfindselector).
 
+### `FindWrapper#filterWhere(predicate)`
+Returns a new `FindWrapper` with a subset of the previously selected elements which, when passed into the provided predicate function, return true.
+
 ### `FindWrapper#find(selector)`
 Selects descendents of the elements previously selected. Returns a new `FindWrapper` with the newly selected elements.
 
