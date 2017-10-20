@@ -171,6 +171,11 @@ Selects descendents of the elements previously selected. Returns a new `FindWrap
 
 Uses the same possible selectors as [`RenderContext#find(selector)`](#rendercontextfindselector).
 
+### `FindWrapper#first()`
+Returns another `FindWrapper` at the first index in the selection.
+
+### `FindWrapper#last()`
+Returns another `FindWrapper` at the last index in the selection.
 
 ### `FindWrapper#setState(newState)`
 Requires a single node, which is a class based component.
