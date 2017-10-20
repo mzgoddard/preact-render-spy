@@ -164,6 +164,9 @@ Searches for any children matching the vdom or text passed.
 ### `FindWrapper#childAt(index)`
 Returns `FindWrapper` with child at given index.
 
+### `FindWrapper#children()`
+Returns `FindWrapper` with children of current wrapper.
+
 ### `FindWrapper#filter(selector)`
 Returns a new `FindWrapper` with a subset of the previously selected elements given the selector argument.
 

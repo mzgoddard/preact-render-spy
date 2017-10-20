@@ -32,6 +32,11 @@ export interface FindWrapper<P, S> {
     childAt<Q, T>(index: number): FindWrapper<Q, T>;
 
     /**
+     * Returns `FindWrapper` with children of current wrapper.
+     **/
+    children<Q, T>(): FindWrapper<Q, T>;
+
+    /**
      * Returns a new `FindWrapper` with a subset of the previously selected elements given the selector argument.
      * Uses the same selectors as .find()
      **/
