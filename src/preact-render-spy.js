@@ -270,6 +270,20 @@ class FindWrapper {
     );
   }
 
+  name() {
+    verifyFoundNodes(this);
+
+    if (this.length !== 1) {
+      throw new Error('preact-render-spy: component method can only be used on a single node');
+    }
+
+    const nodeName = this[0].nodeName;
+
+    return typeof nodeName === 'function'
+      ? nodeName.name
+      : nodeName;
+  }
+
   component() {
     if (this.length !== 1) {
       throw new Error('preact-render-spy: component method can only be used on a single node');

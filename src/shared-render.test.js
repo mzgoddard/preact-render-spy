@@ -171,6 +171,16 @@ const sharedTests = (name, func) => {
     expect(context.filter(<span />).length).toBe(0);
   });
 
+  it(`${name}: returns node name`, () => {
+    const componentContext = func(<Div />);
+    const elementContext = func(<span />);
+    const multiContext = func(<div><Div /><Div /><Div /></div>);
+
+    expect(componentContext.name()).toBe('Div');
+    expect(elementContext.name()).toBe('span');
+    expect(() => multiContext.find('div').name()).toThrow();
+  });
+
   it(`${name}: output returns vdom output by a Component`, () => {
     const context = func(<DivChildren><span /></DivChildren>);
     expect(() => context.find('div').output()).toThrow();
