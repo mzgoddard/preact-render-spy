@@ -261,6 +261,16 @@ class FindWrapper {
     );
   }
 
+  children() {
+    verifyFoundNodes(this);
+    verifyOnlySingleNode(this);
+
+    return new FindWrapper(
+      this.context,
+      this[0].children
+    );
+  }
+
   simulate(event, ...args) {
     verifyFoundNodes(this);
     for (let i = 0; i < this.length; i++) {
