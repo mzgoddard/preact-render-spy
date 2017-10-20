@@ -270,6 +270,13 @@ class FindWrapper {
     );
   }
 
+  map(callback) {
+    verifyFoundNodes(this);
+    return Array.from(this).map((vnode, index) =>
+      callback(new FindWrapper(this.context, [vnode]), index)
+    );
+  }
+
   component() {
     if (this.length !== 1) {
       throw new Error('preact-render-spy: component method can only be used on a single node');
