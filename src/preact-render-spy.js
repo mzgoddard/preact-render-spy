@@ -164,6 +164,12 @@ const verifyFoundNodes = wrapper => {
   }
 };
 
+const verifyOnlySingleNode = wrapper => {
+  if (wrapper.length !== 1) {
+    throw new Error('preact-render-spy: component method can only be used on a single node');
+  }
+};
+
 class FindWrapper {
   constructor(context, _iter, selector) {
     // Set a non-enumerable property for context. In case a user does an deep
@@ -240,6 +246,21 @@ class FindWrapper {
       .length > 0;
   }
 
+  childAt(index) {
+    verifyFoundNodes(this);
+    verifyOnlySingleNode(this);
+    const children = this[0].children;
+
+    if (index >= children.length) {
+      throw new Error(`preact-render-spy: Must have enough results for .childAt(${index}).`);
+    }
+
+    return new FindWrapper(
+      this.context,
+      [children[index]]
+    );
+  }
+
   simulate(event, ...args) {
     verifyFoundNodes(this);
     for (let i = 0; i < this.length; i++) {
@@ -271,9 +292,7 @@ class FindWrapper {
   }
 
   component() {
-    if (this.length !== 1) {
-      throw new Error('preact-render-spy: component method can only be used on a single node');
-    }
+    verifyOnlySingleNode(this);
     verifyFoundNodes(this);
 
     const ref = this.context.componentMap.get(this[0]);

@@ -154,6 +154,15 @@ const sharedTests = (name, func) => {
     expect(context.contains(<DivChildren><div class="first" /><span class="second"><div class="third" /></span></DivChildren>)).toBeTruthy();
   });
 
+  it(`${name}: childAt() returns child at specific index`, () => {
+    const context = func(<DivChildren><div class="first" /><div class="second" /><div class="third" /></DivChildren>);
+    expect(context.childAt(0).attr('class')).toBe('first');
+    expect(context.childAt(1).attr('class')).toBe('second');
+    expect(context.childAt(2).attr('class')).toBe('third');
+    expect(() => context.childAt(3).attr('class')).toThrow();
+    expect(() => context.find('NotExistingComponent').childAt(0)).toThrow();
+  });
+
   it(`${name}: filters components`, () => {
     const context = func(<div><NullStateless class="first" /><NullStateless class="second" /></div>);
     expect(context.find('NullStateless').length).toBe(2);
