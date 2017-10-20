@@ -161,6 +161,9 @@ expect(context.component()).toBeInstanceOf(MyComponent);
 ### `FindWrapper#contains(vdom)`
 Searches for any children matching the vdom or text passed.
 
+### `FindWrapper#childAt(index)`
+Returns `FindWrapper` with child at given index.
+
 ### `FindWrapper#filter(selector)`
 Returns a new `FindWrapper` with a subset of the previously selected elements given the selector argument.
 
