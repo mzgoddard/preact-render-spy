@@ -281,7 +281,6 @@ class FindWrapper {
     verifyOnlySingleNode(this);
 
     const nodeName = this[0].nodeName;
-
     return typeof nodeName === 'function'
       ? nodeName.name
       : nodeName;

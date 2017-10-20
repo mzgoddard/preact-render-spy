@@ -33,6 +33,12 @@ export interface FindWrapper<P, S> {
     filter<Q, T>(selector: string): FindWrapper<Q, T>;
 
     /**
+     * Returns the name of node.
+     * This can only be called on a wrapper of a single node.
+     **/
+    name(): string;
+
+    /**
      * Selects descendents of the elements previously selected. Returns a new `FindWrapper` with the newly selected
      * elements.
      **/
