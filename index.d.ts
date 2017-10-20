@@ -33,6 +33,12 @@ export interface FindWrapper<P, S> {
     filter<Q, T>(selector: string): FindWrapper<Q, T>;
 
     /**
+     * Maps array of nodes from this `FindWrapper` to another array.
+     * Each node is passed in as a `FindWrapper` to the map function along with index number of element.
+     **/
+    map<Q, T>(fn: (element: FindWrapper<Q, T>, index: number) => any): any[];
+
+    /**
      * Selects descendents of the elements previously selected. Returns a new `FindWrapper` with the newly selected
      * elements.
      **/

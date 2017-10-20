@@ -270,10 +270,10 @@ class FindWrapper {
     );
   }
 
-  map(callback) {
+  map(fn) {
     verifyFoundNodes(this);
     return Array.from(this).map((vnode, index) =>
-      callback(new FindWrapper(this.context, [vnode]), index)
+      fn(new FindWrapper(this.context, [vnode]), index)
     );
   }
 
