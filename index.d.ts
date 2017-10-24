@@ -27,6 +27,16 @@ export interface FindWrapper<P, S> {
     contains(vdom: preact.VNode | string): boolean;
 
     /**
+     * Returns `FindWrapper` with child at given index.
+     **/
+    childAt<Q, T>(index: number): FindWrapper<Q, T>;
+
+    /**
+     * Returns `FindWrapper` with children of current wrapper.
+     **/
+    children<Q, T>(): FindWrapper<Q, T>;
+
+    /**
      * Returns whether or not given node exists.
      **/
     exists(): boolean;
