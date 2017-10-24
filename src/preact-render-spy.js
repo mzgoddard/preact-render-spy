@@ -246,21 +246,6 @@ class FindWrapper {
       .length > 0;
   }
 
-  childAt(index) {
-    verifyFoundNodes(this);
-    verifyOnlySingleNode(this);
-    const children = this[0].children;
-
-    if (index >= children.length) {
-      throw new Error(`preact-render-spy: Must have enough results for .childAt(${index}).`);
-    }
-
-    return new FindWrapper(
-      this.context,
-      [children[index]]
-    );
-  }
-
   children() {
     verifyFoundNodes(this);
     verifyOnlySingleNode(this);
@@ -269,6 +254,10 @@ class FindWrapper {
       this.context,
       this[0].children
     );
+  }
+
+  childAt(index) {
+    return this.children().at(index);
   }
 
   exists() {
