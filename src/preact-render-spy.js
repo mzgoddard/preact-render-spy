@@ -281,9 +281,16 @@ class FindWrapper {
     verifyOnlySingleNode(this);
 
     const nodeName = this[0].nodeName;
-    return typeof nodeName === 'function'
-      ? nodeName.name
-      : nodeName;
+
+    if (nodeName.displayName) {
+      return nodeName.displayName;
+    }
+
+    if (typeof nodeName === 'function') {
+      return nodeName.name;
+    }
+
+    return nodeName;
   }
 
   component() {
