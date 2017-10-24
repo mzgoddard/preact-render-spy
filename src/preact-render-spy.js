@@ -240,6 +240,11 @@ class FindWrapper {
       .length > 0;
   }
 
+  exists() {
+    verifyFoundNodes(this);
+    return this.length > 0;
+  }
+
   simulate(event, ...args) {
     verifyFoundNodes(this);
     for (let i = 0; i < this.length; i++) {

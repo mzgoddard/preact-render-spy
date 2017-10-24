@@ -27,6 +27,11 @@ export interface FindWrapper<P, S> {
     contains(vdom: preact.VNode | string): boolean;
 
     /**
+     * Returns whether or not given node exists.
+     **/
+    exists(): boolean;
+
+    /**
      * Returns a new `FindWrapper` with a subset of the previously selected elements given the selector argument.
      * Uses the same selectors as .find()
      **/
