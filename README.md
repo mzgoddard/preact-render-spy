@@ -170,6 +170,19 @@ Uses the same possible selectors as [`RenderContext#find(selector)`](#rendercont
 Maps array of nodes from this `FindWrapper` to another array.
 Each node is passed in as a `FindWrapper` to the map function along with index number of element.
 
+```jsx
+const context = shallow((
+  <ul>
+    <li class="item">first</li>
+    <li class="item">second</li>
+    <li class="item">third</li>
+  </ul>
+));
+
+const items = context.find('.item').map(node => node.text());
+expect(items).toEqual(['first', 'second', 'third']);
+```
+
 ### `FindWrapper#find(selector)`
 Selects descendents of the elements previously selected. Returns a new `FindWrapper` with the newly selected elements.
 
