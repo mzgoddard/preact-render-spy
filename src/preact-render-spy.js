@@ -256,10 +256,6 @@ class FindWrapper {
     );
   }
 
-  childAt(index) {
-    return this.children().at(index);
-  }
-
   exists() {
     verifyFoundNodes(this);
     return this.length > 0;
