@@ -161,6 +161,29 @@ const sharedTests = (name, func) => {
     expect(context.contains(<DivChildren><div class="first" /><span class="second"><div class="third" /></span></DivChildren>)).toBeTruthy();
   });
 
+  it(`${name}: childAt() returns child at specific index`, () => {
+    const context = func(<DivChildren><div class="first" /><div class="second" /><div class="third" /></DivChildren>);
+    expect(context.childAt(0).attr('class')).toBe('first');
+    expect(context.childAt(1).attr('class')).toBe('second');
+    expect(context.childAt(2).attr('class')).toBe('third');
+    expect(() => context.childAt(3).attr('class')).toThrow();
+    expect(() => context.find('NotExistingComponent').childAt(0)).toThrow();
+  });
+
+  it(`${name}: children() returns children`, () => {
+    const context = func(<DivChildren><div class="first" /><div class="second" /><div class="third" /></DivChildren>);
+    expect(context.children().length).toBe(3);
+    expect(context.children().at(0).attr('class')).toBe('first');
+    expect(context.children().at(1).attr('class')).toBe('second');
+    expect(context.children().at(2).attr('class')).toBe('third');
+  });
+
+  it(`${name}: exists() returns whether or not given node exists`, () => {
+    const context = func(<div><div class="existing-class" /></div>);
+    expect(context.find('.existing-class').exists()).toBe(true);
+    expect(context.find('.not-existing-class').exists()).toBe(false);
+  });
+
   it(`${name}: filters components`, () => {
     const context = func(<div><NullStateless class="first" /><NullStateless class="second" /></div>);
     expect(context.find('NullStateless').length).toBe(2);

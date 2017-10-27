@@ -161,6 +161,21 @@ expect(context.component()).toBeInstanceOf(MyComponent);
 ### `FindWrapper#contains(vdom)`
 Searches for any children matching the vdom or text passed.
 
+### `FindWrapper#children()`
+Returns `FindWrapper` with children of current wrapper.
+
+### `FindWrapper#childAt(index)`
+Returns `FindWrapper` with child at given index.
+This has the same effect as calling `wrapper.children().at(index)`.
+
+```jsx
+const context = shallow(<List items={items} />);
+expect(context.childAt(1).text()).toBe('Second list element');
+```
+
+### `FindWrapper#exists()`
+Returns whether or not given node exists.
+
 ### `FindWrapper#filter(selector)`
 Returns a new `FindWrapper` with a subset of the previously selected elements given the selector argument.
 

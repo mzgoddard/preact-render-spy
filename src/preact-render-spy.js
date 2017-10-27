@@ -164,9 +164,9 @@ const verifyFoundNodes = wrapper => {
   }
 };
 
-const verifyOnlySingleNode = wrapper => {
+const verifyOnlySingleNode = (wrapper, methodName) => {
   if (wrapper.length !== 1) {
-    throw new Error('preact-render-spy: component method can only be used on a single node');
+    throw new Error(`preact-render-spy: ${methodName} method can only be used on a single node`);
   }
 };
 
@@ -246,6 +246,25 @@ class FindWrapper {
       .length > 0;
   }
 
+  children() {
+    verifyFoundNodes(this);
+    verifyOnlySingleNode(this, 'children');
+
+    return new FindWrapper(
+      this.context,
+      this[0].children
+    );
+  }
+
+  childAt(index) {
+    return this.children().at(index);
+  }
+
+  exists() {
+    verifyFoundNodes(this);
+    return this.length > 0;
+  }
+
   simulate(event, ...args) {
     verifyFoundNodes(this);
     for (let i = 0; i < this.length; i++) {
@@ -278,7 +297,7 @@ class FindWrapper {
 
   name() {
     verifyFoundNodes(this);
-    verifyOnlySingleNode(this);
+    verifyOnlySingleNode(this, 'name');
 
     const nodeName = this[0].nodeName;
 
@@ -294,8 +313,8 @@ class FindWrapper {
   }
 
   component() {
+    verifyOnlySingleNode(this, 'component');
     verifyFoundNodes(this);
-    verifyOnlySingleNode(this);
 
     const ref = this.context.componentMap.get(this[0]);
 
