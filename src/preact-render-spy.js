@@ -287,20 +287,13 @@ class FindWrapper {
     return new FindWrapper(this.context, Array.from(this), selector);
   }
 
-  filter(selector) {
+  filter(predicate) {
     verifyFoundNodes(this);
     return new FindWrapper(
       this.context,
-      Array.from(this).filter(isWhere(selToWhere(selector)))
-    );
-  }
-
-  filterWhere(predicate) {
-    verifyFoundNodes(this);
-    return new FindWrapper(
-      this.context,
-      Array.from(this).filter(
-        (vnode, ...attrs) => predicate(new FindWrapper(this.context, [vnode]), ...attrs)
+      Array.from(this).filter(typeof predicate === 'function'
+        ? (vnode, ...attrs) => predicate(new FindWrapper(this.context, [vnode]), ...attrs)
+        : isWhere(selToWhere(predicate))
       )
     );
   }
