@@ -176,13 +176,23 @@ expect(context.childAt(1).text()).toBe('Second list element');
 ### `FindWrapper#exists()`
 Returns whether or not given node exists.
 
-### `FindWrapper#filter(selector)`
-Returns a new `FindWrapper` with a subset of the previously selected elements given the selector argument.
+### `FindWrapper#filter(predicate)`
+Returns a new `FindWrapper` with a subset of the previously selected elements given the predicate argument. `predicate` can either be a string, then it is treated as a selector, or a function that returns a boolean value.
 
-Uses the same possible selectors as [`RenderContext#find(selector)`](#rendercontextfindselector).
+Example:
+```jsx
+const context = shallow(
+  <div>
+    <div class="unique" />
+    <div />
+    <div />
+  </div>
+);
 
-### `FindWrapper#filterWhere(predicate)`
-Returns a new `FindWrapper` with a subset of the previously selected elements which, when passed into the provided predicate function, return true.
+expect(context.find('div').filter('.unique').length).toEqual(1);
+
+expect(context.find('div').filter(el => el.attr('class') === 'unique').length).toEqual(1);
+```
 
 ### `FindWrapper#find(selector)`
 Selects descendents of the elements previously selected. Returns a new `FindWrapper` with the newly selected elements.
