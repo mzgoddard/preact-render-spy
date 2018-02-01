@@ -96,7 +96,25 @@ interface ShallowFunction {
     <P, S>(vdom: JSX.Element): RenderContext<P, S>;
 }
 
+interface Options {
+    attributeHook: Function;
+    functionNames: boolean;
+    functions: boolean;
+    jsx: boolean;
+    skipFalseAttributes: boolean;
+    pretty: boolean;
+    shallow: boolean;
+    xml: boolean;
+}
+
+export const config: {
+    SPY_PRIVATE_KEY: string;
+    createFragment: () => Document | Element;
+    toStringOptions: Options;
+}
+
 export const deep: DeepFunction;
 export const render: DeepFunction;
+export const rerender: DeepFunction;
 export const shallow: ShallowFunction;
 export default deep;
