@@ -102,7 +102,7 @@ interface ShallowFunction {
     <P, S>(vdom: JSX.Element): RenderContext<P, S>;
 }
 
-interface Options {
+interface ToStringOptions {
     attributeHook: Function;
     functionNames: boolean;
     functions: boolean;
@@ -116,7 +116,7 @@ interface Options {
 export const config: {
     SPY_PRIVATE_KEY: string;
     createFragment: () => Document | Element;
-    toStringOptions: Options;
+    toStringOptions: ToStringOptions;
 }
 
 export const deep: DeepFunction;
