@@ -71,6 +71,12 @@ export interface RenderContext<P, S> extends FindWrapper<P, S> {
      * test wrapper component.
      **/
     render<Q, T>(jsx: JSX.Element): RenderContext<Q, T>;
+
+    /**
+     * Re-renders the same JSX with the same depth that was initially requested. This is helpful in performing any
+     * state changes in the render queue.
+     **/
+    rerender<Q, T>(): RenderContext<Q, T>;
 }
 
 /** Options for DeepFunction. */
