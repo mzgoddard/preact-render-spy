@@ -17,6 +17,16 @@ export interface FindWrapper<P, S> {
      **/
     at<Q, T>(index: number): FindWrapper<Q, T>;
 
+    /**
+     * Returns another `FindWrapper` at the first index in the selection.
+     **/
+    first<Q, T>(): FindWrapper<Q, T>;
+
+    /**
+     * Returns another `FindWrapper` at the last index in the selection.
+     **/
+    last<Q, T>(): FindWrapper<Q, T>;
+
     /** Requires a single node selection to work. Returns the value of the name attribute on the jsx node. */
     attr<K extends keyof P>(name: K): P[K];
 

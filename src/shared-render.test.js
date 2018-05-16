@@ -121,6 +121,24 @@ const sharedTests = (name, func) => {
     expect(context.find('div').at(1)[0]).toEqual(<div />);
   });
 
+  it(`${name}: first() returns the first member`, () => {
+    const context = func(<div><div class="first" /><div class="last" /></div>);
+    expect(() => context.first()).not.toThrow();
+    expect(() => context.find('span').first()).toThrow();
+    const found = context.find('div').first();
+    expect(found).toHaveLength(1);
+    expect(found[0]).toEqual(<div class="first" />);
+  });
+
+  it(`${name}: last() returns the last member`, () => {
+    const context = func(<div><div class="first" /><div class="last" /></div>);
+    expect(() => context.last()).not.toThrow();
+    expect(() => context.find('span').last()).toThrow();
+    const found = context.find('div').last();
+    expect(found).toHaveLength(1);
+    expect(found[0]).toEqual(<div class="last" />);
+  });
+
   it(`${name}: attr() returns the attribute value`, () => {
     const context = func(<DivChildren count={1}><div class="first" /><div class="second" /></DivChildren>);
     expect(() => context.find('div').attr('class')).toThrow();

@@ -200,6 +200,20 @@ class FindWrapper {
     return new FindWrapper(this.context, [this[index]]);
   }
 
+  first() {
+    if (this.length <= 0) {
+      throw new Error(`preact-render-spy: Must have at least one result for .first().`);
+    }
+    return this.at(0);
+  }
+
+  last() {
+    if (this.length <= 0) {
+      throw new Error(`preact-render-spy: Must have at least one result for .last().`);
+    }
+    return this.at(this.length - 1);
+  }
+
   attr(name) {
     if (this.length > 1 || this.length === 0) {
       throw new Error(`preact-render-spy: Must have only 1 result for .attr(${name})`);
