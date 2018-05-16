@@ -26,6 +26,9 @@ export interface FindWrapper<P, S> {
     /** Searches for any children matching the vdom or text passed. */
     contains(vdom: preact.VNode | string): boolean;
 
+    /** Returns preact instance */
+    component(): any;
+
     /**
      * Returns `FindWrapper` with child at given index.
      **/
@@ -51,13 +54,19 @@ export interface FindWrapper<P, S> {
      * Selects descendents of the elements previously selected. Returns a new `FindWrapper` with the newly selected
      * elements.
      **/
-    find<Q, T>(selector: string | JSX.Element): FindWrapper<Q, T>;
+    find<Q, T>(selector: preact.VNode | string): FindWrapper<Q, T>;
 
     /** Requires a single `Component` or functional node. Returns the raw vdom output of the given component. */
     output(): preact.VNode;
 
+    /** Sets the wrapper state. */
+    setState(newState: Object): Object;
+
     /** Looks for an attribute properly named `onEvent` or `onEventCapture` and calls it, passing the arguments. */
     simulate(event: string, ...args: any[]): void;
+
+    /** Returns a state object or a specific key value. */
+    state(key?: string): any;
 
     /** Returns the flattened string of any text children of any child component. */
     text(): string;
