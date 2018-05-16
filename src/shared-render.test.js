@@ -212,6 +212,14 @@ const sharedTests = (name, func) => {
     expect(context.filter(<span />).length).toBe(0);
   });
 
+  it(`${name}: map components`, () => {
+    const context = func(<div><NullStateless class="first" /><NullStateless class="second" /></div>);
+    expect(context.find('NullStateless').map((n, i) => [n.attr('class'), i])).toEqual([
+      ['first', 0],
+      ['second', 1],
+    ]);
+  });
+
   it(`${name}: output returns vdom output by a Component`, () => {
     const context = func(<DivChildren><span /></DivChildren>);
     expect(() => context.find('div').output()).toThrow();

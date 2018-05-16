@@ -309,6 +309,13 @@ class FindWrapper {
     );
   }
 
+  map(fn) {
+    verifyFoundNodes(this);
+    return Array.from(this).map((vnode, index) =>
+      fn(new FindWrapper(this.context, [vnode]), index)
+    );
+  }
+
   component() {
     verifyOnlySingleNode(this, 'component');
     verifyFoundNodes(this);
