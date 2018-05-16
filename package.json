@@ -1,6 +1,6 @@
 {
   "name": "preact-render-spy",
-  "version": "1.2.2",
+  "version": "1.3.0",
   "description": "Render preact components with access to the produced virtual dom for testing.",
   "repository": {
     "type": "git",
