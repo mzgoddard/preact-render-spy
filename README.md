@@ -181,6 +181,19 @@ Returns a new `FindWrapper` with a subset of the previously selected elements gi
 
 Uses the same possible selectors as [`RenderContext#find(selector)`](#rendercontextfindselector).
 
+### `FindWrapper#name()`
+Returns the name of node.
+This can only be called on a wrapper of a single node.
+
+```jsx
+function MyComponent() {
+  return <Node />;
+}
+
+const context = shallow(<MyComponent />);
+expect(context.name()).toBe('Node');
+```
+
 ### `FindWrapper#find(selector)`
 Selects descendents of the elements previously selected. Returns a new `FindWrapper` with the newly selected elements.
 

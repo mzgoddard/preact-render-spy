@@ -309,6 +309,23 @@ class FindWrapper {
     );
   }
 
+  name() {
+    verifyFoundNodes(this);
+    verifyOnlySingleNode(this, 'name');
+
+    const nodeName = this[0].nodeName;
+
+    if (nodeName.displayName) {
+      return nodeName.displayName;
+    }
+
+    if (typeof nodeName === 'function') {
+      return nodeName.name;
+    }
+
+    return nodeName;
+  }
+
   component() {
     verifyOnlySingleNode(this, 'component');
     verifyFoundNodes(this);

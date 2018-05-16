@@ -54,6 +54,13 @@ class DivCount extends Component {
   }
 }
 
+class NamedComponent extends Component {
+  render() {
+    return <div />;
+  }
+}
+NamedComponent.displayName = 'Named test component';
+
 const Text = () => 'Text';
 
 const DivCountStateless = ({count}) => <div>{count}</div>;
@@ -210,6 +217,18 @@ const sharedTests = (name, func) => {
     expect(context.find(<NullStateless something={null} />).length).toBe(1);
     expect(context.filter(<div />).length).toBe(1);
     expect(context.filter(<span />).length).toBe(0);
+  });
+
+  it(`${name}: returns node name`, () => {
+    const componentContext = func(<Div />);
+    const elementContext = func(<span />);
+    const namedComponentContext = func(<NamedComponent />);
+    const multiContext = func(<div><Div /><Div /><Div /></div>);
+
+    expect(componentContext.name()).toBe('Div');
+    expect(elementContext.name()).toBe('span');
+    expect(namedComponentContext.name()).toBe('Named test component');
+    expect(() => multiContext.find('div').name()).toThrow();
   });
 
   it(`${name}: output returns vdom output by a Component`, () => {
