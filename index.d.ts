@@ -51,7 +51,7 @@ export interface FindWrapper<P, S> {
      * Selects descendents of the elements previously selected. Returns a new `FindWrapper` with the newly selected
      * elements.
      **/
-    find<Q, T>(selector: string): FindWrapper<Q, T>;
+    find<Q, T>(selector: string | JSX.Element): FindWrapper<Q, T>;
 
     /** Requires a single `Component` or functional node. Returns the raw vdom output of the given component. */
     output(): preact.VNode;
