@@ -61,6 +61,7 @@ function exerciseFindWrapper<P, S, K extends keyof P>(wrapper: FindWrapper<P, S>
     const atWrapper: FindWrapper<any, any> = wrapper.at<any, any>(0);
     const filterWrapper: FindWrapper<any, any> = wrapper.filter<any, any>("selector");
     const findWrapper: FindWrapper<any, any> = wrapper.find<any, any>("selector");
+    const findWrapper2: FindWrapper<any, any> = wrapper.find<any, any>(<CompA />);
     const attrs: P = wrapper.attrs();
     const attr: P[K] = wrapper.attr(attrKey);
     let simulate: void = wrapper.simulate("click");
