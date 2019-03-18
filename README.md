@@ -8,7 +8,7 @@ as many options currently.
 
 ## Support:
 
-We do our best to support Node.JS v6.11.0 and up, and speficially testing with jest, though other test runners should have no problems.
+We do our best to support Node.JS v6.11.0 and up, and specifically testing with jest, though other test runners should have no problems.
 
 ## Expressive Testing Example:
 
@@ -32,7 +32,7 @@ spies which wrap the component.  These spies then look at the rendered output of
 second level of JSX and stores a big map of all the JSX virtual DOM nodes that have
 been created by your component.
 
-There is also concept of limiting the `depth` of the rendering such that it will only resolve
+There is also a concept of limiting the `depth` of the rendering such that it will only resolve
 a certain number of levels deep in the component tree.  The `depth` of the default renderer
 is set to `Infinity`, and we provide another renderer called `shallow` to render with
 `{ depth: 1 }`.
@@ -95,15 +95,15 @@ Creates a new `RenderContext` with `{ depth: 1 }`.
 ### `RenderContext#find(selector)`
 Given a rendered context, `find` accepts a "css like" language of selectors to search through the
 rendered vdom for given nodes.  **NOTE:** We only support this very limited set of "selectors", and no nesting.
-We may expand this selector language in future versions, but it acheives our goals so far!
+We may expand this selector language in future versions, but it achieves our goals so far!
 
 * `find('.selector')` - searches for any nodes with `class` or `className` attribute that matches `selector`
 * `find('#selector')` - searches for any nodes with an `id` attribute that matches `selector`
 * `find('[selector]')` - searches for any nodes which have an attribute named `selector`
 * `find('Selector')` - searches for any nodes which have a nodeName that matches `Selector`,
-  this will search for function/classes whos `name` is `Selector`, or `displayName` is `Selector`.
+  this will search for function/classes whose `name` is `Selector`, or `displayName` is `Selector`.
   If the `Selector` starts with a lower case letter, it will also check for tags like `div`.
-* `find(<Selector simple="attributes" class="working" />)` - searches for any nodes whos nodeName equals `Selector`
+* `find(<Selector simple="attributes" class="working" />)` - searches for any nodes whose nodeName equals `Selector`
   and attributes match the ones given in the JSX.  **NOTE:** This does not support children, just simple attributes.
   Can be useful to find components from minified output that don't include display names.
   `.find(<ImportedComponent />)` will look for JSX nodes using the same `ImportedComponent` function.
