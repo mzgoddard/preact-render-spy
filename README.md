@@ -8,7 +8,7 @@ as many options currently.
 
 ## Support:
 
-We do our best to support Node.JS v6.11.0 and up, and speficially testing with jest, though other test runners should have no problems.
+We do our best to support Node.JS v6.11.0 and up, and specifically testing with [jest](https://www.npmjs.com/package/jest), though other test runners should have no problems.
 
 ## Expressive Testing Example:
 
@@ -29,7 +29,7 @@ it('lets you do cool things with preact components', () => {
 
 The main render method takes some arbitrary JSX and replaces any component nodes with
 spies which wrap the component.  These spies then look at the rendered output of the
-second level of JSX and stores a big map of all the JSX virtual DOM nodes that have
+second level of JSX and store a big map of all the JSX virtual DOM nodes that have
 been created by your component.
 
 There is also concept of limiting the `depth` of the rendering such that it will only resolve
