@@ -95,7 +95,7 @@ export interface RenderContext<P, S> extends FindWrapper<P, S> {
      * way, it will not reuse components, so if you want to test `componentWillReceiveProps` you will need to use a
      * test wrapper component.
      **/
-    render<Q, T>(jsx: JSX.Element): RenderContext<Q, T>;
+    render<Q, T>(jsx: preact.JSX.Element): RenderContext<Q, T>;
 
     /**
      * Re-renders the same JSX with the same depth that was initially requested. This is helpful in performing any
@@ -118,13 +118,13 @@ interface DeepFunction {
      *
      * Default depth: `Infinity`.
      **/
-    <P, S>(vdom: JSX.Element, options?: DeepOptions): RenderContext<P, S>;
+    <P, S>(vdom: preact.JSX.Element, options?: DeepOptions): RenderContext<P, S>;
 }
 
 /** Shallow render function */
 interface ShallowFunction {
     /** Creates a new RenderContext with `{ depth: 1 }`. */
-    <P, S>(vdom: JSX.Element): RenderContext<P, S>;
+    <P, S>(vdom: preact.JSX.Element): RenderContext<P, S>;
 }
 
 interface ToStringOptions {
